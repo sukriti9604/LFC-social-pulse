@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LFC Instagram Weekly Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --purple:#8B2A7A; --purple-dark:#5E1C54; --orange:#F5A623;
+    --ink:#2B1830; --paper:#FBF8F3; --paper-line:#E7DCE4;
+    --lavender:#F5EEF3; --muted:#7A6B77; --good:#2F9E5C; --bad:#B3261E;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Nunito',sans-serif;color:var(--ink);background:linear-gradient(180deg,var(--lavender) 0%, #fff 380px);min-height:100vh;}
+  header{padding:24px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;color:#fff;font-size:16px;}
+  .brand h1{font-family:'Baloo 2';font-size:19px;margin:0;color:var(--purple-dark);}
+  .brand p{margin:0;font-size:12px;color:var(--muted);}
+
+  main{max-width:1180px;margin:0 auto;padding:30px 32px 80px;display:grid;grid-template-columns:300px 1fr;gap:28px;}
+  @media (max-width:900px){ main{grid-template-columns:1fr;} }
+
+  .panel{background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:20px;}
+  .panel h2{font-family:'Baloo 2';font-size:14px;margin:0 0 14px;color:var(--purple-dark);text-transform:uppercase;letter-spacing:.05em;}
+  label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin:12px 0 5px;text-transform:uppercase;letter-spacing:.03em;}
+  label:first-of-type{margin-top:0;}
+  input[type=date],input[type=text]{width:100%;padding:8px 9px;border-radius:8px;border:1.5px solid var(--paper-line);font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink);}
+  .range-row{display:flex;gap:6px;align-items:center;}
+  .range-row span{color:var(--muted);font-size:11px;}
+  .presets{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+  .preset-chip{padding:4px 9px;border-radius:100px;border:1px solid var(--paper-line);background:var(--lavender);font-size:11px;font-weight:700;color:var(--purple-dark);cursor:pointer;}
+  .generate-btn{width:100%;margin-top:18px;padding:12px;border:none;border-radius:10px;background:var(--purple);color:#fff;font-family:'Baloo 2';font-weight:700;font-size:14.5px;cursor:pointer;}
+  .generate-btn:hover{background:var(--purple-dark);}
+  .generate-btn:disabled{background:#C9B9C5;cursor:wait;}
+  .download-btn{width:100%;margin-top:9px;padding:12px;border:none;border-radius:10px;background:var(--orange);color:#4A2E00;font-family:'Baloo 2';font-weight:700;font-size:14.5px;cursor:pointer;}
+  .download-btn:disabled{opacity:.4;cursor:not-allowed;}
+  .status{font-size:11.5px;color:var(--muted);margin-top:9px;min-height:15px;}
+  .status.err{color:var(--bad);}
+  .status a{color:var(--purple-dark);}
+  .hint{font-size:11px;color:var(--muted);margin-top:16px;line-height:1.5;padding-top:12px;border-top:1px solid var(--paper-line);}
+
+  #report-wrap{display:flex;justify-content:center;}
+  #report{width:740px;max-width:100%;background:var(--paper);border:1px solid var(--paper-line);box-shadow:0 12px 32px rgba(139,42,122,.08);padding:40px 42px;}
+  .empty-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px;}
+  .empty-state b{color:var(--purple-dark);}
+
+  .lfc-name{font-weight:800;font-size:12.5px;letter-spacing:.04em;color:var(--purple-dark);}
+  .r-title{font-family:'Baloo 2';font-size:23px;font-weight:800;color:var(--purple-dark);margin:4px 0 10px;}
+  .r-meta{font-size:12.5px;color:var(--muted);margin-bottom:4px;}
+  .r-meta input{border:none;border-bottom:1px dashed var(--paper-line);background:transparent;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink);width:160px;}
+  .r-divider{height:2px;background:linear-gradient(90deg,var(--purple),var(--orange));margin:16px 0 20px;border-radius:2px;}
+
+  .section-title{font-family:'Baloo 2';font-size:14px;font-weight:700;color:var(--purple-dark);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.03em;padding-bottom:6px;border-bottom:2px solid var(--paper-line);}
+  .section-hint{font-size:11px;color:var(--muted);font-style:italic;margin:-6px 0 10px;}
+
+  [contenteditable]{outline:none;border-bottom:1px dashed var(--paper-line);min-height:1.4em;padding:2px 1px;}
+  [contenteditable]:empty:before{content:attr(data-placeholder);color:#B8AAB4;}
+  [contenteditable]:focus{border-bottom:1px solid var(--purple);background:#fff;}
+
+  table.data-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px;}
+  table.data-table th{text-align:left;font-family:'Space Mono',monospace;font-weight:400;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:5px 6px;border-bottom:1.5px solid var(--paper-line);}
+  table.data-table td{padding:6px;border-bottom:1px solid var(--paper-line);vertical-align:top;}
+  table.data-table tr:last-child td{border-bottom:none;}
+  .num{font-family:'Space Mono',monospace;font-weight:700;}
+
+  .goal-status{font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--paper-line);background:#fff;font-family:'Nunito';}
+
+  .add-row-btn{font-size:11px;font-weight:700;color:var(--purple-dark);background:var(--lavender);border:1px solid var(--paper-line);border-radius:7px;padding:4px 10px;cursor:pointer;margin-top:4px;}
+
+  .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px;}
+  .stat-box{background:#fff;border:1px solid var(--paper-line);border-radius:9px;padding:10px;text-align:center;}
+  .stat-box .v{font-family:'Space Mono',monospace;font-weight:700;font-size:17px;color:var(--purple-dark);}
+  .stat-box .l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:2px;}
+
+  .r-footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--paper-line);font-size:10px;color:var(--muted);display:flex;justify-content:space-between;font-style:italic;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">LFC</div>
+    <div><h1>Instagram Weekly Report</h1><p>Letters for Change · free report generator</p></div>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Report Setup</h2>
+    <label>Date range</label>
+    <div class="range-row">
+      <input type="date" id="since-input" />
+      <span>to</span>
+      <input type="date" id="until-input" />
+    </div>
+    <div class="presets">
+      <div class="preset-chip" onclick="setPreset(7)">This week (7d)</div>
+      <div class="preset-chip" onclick="setPreset(14)">Last 14d</div>
+    </div>
+    <label>Week number</label>
+    <input type="text" id="week-number-input" placeholder="e.g. Week 1" />
+
+    <button class="generate-btn" id="generate-btn" onclick="generateReport()">Pull Data</button>
+    <button class="download-btn" id="download-btn" onclick="downloadPdf()" disabled>Download PDF</button>
+    <div class="status" id="status-text"></div>
+    <div class="hint">Data pulls automatically. Sections 01, 05–09 need your input before downloading — click into any dashed line in the preview to type.</div>
+  </section>
+
+  <section id="report-wrap">
+    <div id="report">
+      <div class="empty-state" id="empty-state">
+        Pick a date range and click <b>Pull Data</b> — the report will build below, ready for you to fill in the weekly notes.
+      </div>
+      <div id="report-content" style="display:none;">
+        <div class="lfc-name">LETTERS FOR CHANGE</div>
+        <div class="r-title">Instagram Weekly Performance Report</div>
+        <div class="r-meta">📅 <span id="r-week-label">Week —</span></div>
+        <div class="r-meta">📆 <span id="r-daterange">—</span></div>
+        <div class="r-divider"></div>
+
+        <!-- 01 -->
+        <div class="section-title">01 — Week's Highlight ⭐</div>
+        <div class="section-hint">One sentence only — the single best thing that happened this week.</div>
+        <div contenteditable="true" data-placeholder="Click to write this week's highlight..." id="f-highlight"></div>
+
+        <!-- 02 -->
+        <div class="section-title">02 — Follower Growth 👥</div>
+        <table class="data-table">
+          <thead><tr><th>Metric</th><th>This Week</th><th>Last Week</th><th>Change</th></tr></thead>
+          <tbody id="follower-table-body"></tbody>
+        </table>
+
+        <!-- 03 -->
+        <div class="section-title">03 — Post Performance 📊</div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Type</th><th>Reach</th><th>Likes</th><th>Comments</th><th>Saves</th><th>Shares</th><th>Notes</th></tr></thead>
+          <tbody id="post-table-body"></tbody>
+        </table>
+
+        <!-- 04 -->
+        <div class="section-title">04 — Engagement Rate 📈</div>
+        <div class="section-hint">Formula: (Likes + Comments + Saves + Shares) ÷ Reach × 100</div>
+        <div class="stat-strip" id="engagement-stats"></div>
+
+        <!-- 05 -->
+        <div class="section-title">05 — Outreach &amp; Engagement 💬</div>
+        <table class="data-table">
+          <thead><tr><th style="width:45%;">Activity</th><th>Details / count this week</th></tr></thead>
+          <tbody id="outreach-body"></tbody>
+        </table>
+        <button class="add-row-btn" onclick="addOutreachRow()">+ Add row</button>
+
+        <!-- 06 -->
+        <div class="section-title">06 — Monthly Goal Progress 🎯</div>
+        <div class="section-hint">Any 3 of these 7 = success for the month.</div>
+        <table class="data-table">
+          <thead><tr><th style="width:34%;">Goal</th><th style="width:18%;">Status</th><th>Notes</th></tr></thead>
+          <tbody id="goals-body"></tbody>
+        </table>
+        <div style="font-size:12px;margin-top:8px;">
+          <b>Criteria met this month: <span id="goals-met">0</span> / 3</b><br>
+          <b>Criteria in progress: <span id="goals-progress">0</span> / 7</b>
+        </div>
+
+        <!-- 07 -->
+        <div class="section-title">07 — What Worked ✅</div>
+        <div contenteditable="true" data-placeholder="Best performing post or activity, and why..." id="f-worked"></div>
+
+        <!-- 08 -->
+        <div class="section-title">08 — What Didn't Work 🔍</div>
+        <div contenteditable="true" data-placeholder="What underperformed, and a possible reason..." id="f-notworked"></div>
+
+        <!-- 09 -->
+        <div class="section-title">09 — Next Week's Priorities</div>
+        <div class="section-hint">2–3 specific tasks: follow-ups, live sessions, event highlights.</div>
+        <ol id="priorities-list" style="padding-left:18px;font-size:13px;"></ol>
+        <button class="add-row-btn" onclick="addPriorityRow()">+ Add priority</button>
+
+        <div class="r-footer">
+          <span>Letters for Change · Instagram Weekly Report</span>
+          <span id="r-generated-on">Generated —</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const WORKER_URL = "https://lfc-social-report.YOUR-SUBDOMAIN.workers.dev";
+  const GOAL_TEMPLATE = [
+    "One non-profit follows LFC",
+    "One influencer (10k+) follows LFC",
+    "Collab post with a Subject Matter Specialist",
+    "Collab post with an influencer",
+    "Collab with a letter-writing partner org",
+    "Collab with a college club / student body",
+    "Any SMS / NPO / influencer engages with our post",
+  ];
+
+  let reportData = null;
+
+  function setPreset(days){
+    const until = new Date();
+    const since = new Date();
+    since.setDate(since.getDate() - (days - 1));
+    document.getElementById('until-input').value = until.toISOString().slice(0,10);
+    document.getElementById('since-input').value = since.toISOString().slice(0,10);
+  }
+  function setStatus(html, isErr=false){
+    const el = document.getElementById('status-text');
+    el.innerHTML = html;
+    el.className = 'status' + (isErr ? ' err' : '');
+  }
+
+  async function generateReport(){
+    const since = document.getElementById('since-input').value;
+    const until = document.getElementById('until-input').value;
+    if(!since || !until){ setStatus('Pick both start and end dates.', true); return; }
+
+    const btn = document.getElementById('generate-btn');
+    btn.disabled = true;
+    setStatus('Fetching data from Instagram…');
+
+    try{
+      const res = await fetch(`${WORKER_URL}/instagram?since=${since}&until=${until}`);
+      const data = await res.json();
+      if(data.error){
+        if(data.reconnect){
+          setStatus(`${escapeHtml(data.error)} <a href="${WORKER_URL}${data.reconnect}" target="_blank">Reconnect now →</a>`, true);
+          return;
+        }
+        throw new Error(data.error);
+      }
+      reportData = data;
+      renderReport(data, since, until);
+      document.getElementById('download-btn').disabled = false;
+      setStatus('Data pulled. Fill in sections 01, 05–09 below, then download.');
+    }catch(err){
+      setStatus(`Couldn't fetch data: ${escapeHtml(err.message)}`, true);
+    }finally{
+      btn.disabled = false;
+    }
+  }
+
+  function renderReport(data, since, until){
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('report-content').style.display = 'block';
+
+    document.getElementById('r-week-label').textContent = `${document.getElementById('week-number-input').value || 'WEEK —'}`;
+    document.getElementById('r-daterange').textContent = `DATE RANGE — ${fmtDate(since)} to ${fmtDate(until)}`;
+    document.getElementById('r-generated-on').textContent = `Generated ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`;
+
+    // 02 Follower growth
+    const fg = data.followerGrowth;
+    const changeStr = fg.followersChange == null ? '—' : (fg.followersChange > 0 ? `+${fg.followersChange}` : `${fg.followersChange}`);
+    document.getElementById('follower-table-body').innerHTML = `
+      <tr><td>Followers</td><td class="num">${fmtNum(fg.followersThisWeek)}</td><td class="num">${fmtNum(fg.followersLastWeek)}</td><td class="num">${changeStr}</td></tr>
+      <tr><td>Following</td><td class="num">${fmtNum(fg.followingThisWeek)}</td><td class="num">${fmtNum(fg.followingLastWeek)}</td><td class="num">${fg.followingLastWeek!=null ? (fg.followingThisWeek - fg.followingLastWeek) : '—'}</td></tr>
+      <tr><td>Non-Followers reached</td><td contenteditable="true" data-placeholder="type…"></td><td></td><td></td></tr>
+      <tr><td>Unfollows</td><td contenteditable="true" data-placeholder="type…"></td><td></td><td></td></tr>
+    `;
+    if(fg.firstRun){
+      document.getElementById('follower-table-body').insertAdjacentHTML('beforeend',
+        `<tr><td colspan="4" style="font-size:11px;color:var(--muted);font-style:italic;">First report — "Last Week" will populate starting next week's report.</td></tr>`);
+    }
+
+    // 03 Post performance
+    const typeLabel = (t) => ({IMAGE:'Image', VIDEO:'Video', CAROUSEL_ALBUM:'Carousel', REELS:'Reel'}[t] || t || '—');
+    document.getElementById('post-table-body').innerHTML = (data.posts.length ? data.posts.map(p => `
+      <tr>
+        <td>${new Date(p.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
+        <td contenteditable="true">${typeLabel(p.mediaType)}</td>
+        <td class="num">${fmtNum(p.reach)}</td>
+        <td class="num">${fmtNum(p.likes)}</td>
+        <td class="num">${fmtNum(p.comments)}</td>
+        <td class="num">${fmtNum(p.saves)}</td>
+        <td class="num">${fmtNum(p.shares)}</td>
+        <td contenteditable="true" data-placeholder="goal tags, views, profile visits…">${p.plays ? `Views ${p.plays}` : ''}</td>
+      </tr>
+    `).join('') : `<tr><td colspan="8" style="text-align:center;color:var(--muted);">No posts in this range</td></tr>`);
+
+    // 04 Engagement rate
+    const e = data.engagement;
+    document.getElementById('engagement-stats').innerHTML = `
+      <div class="stat-box"><div class="v">${e.overallRate.toFixed(2)}%</div><div class="l">Overall Weekly Rate</div></div>
+      <div class="stat-box"><div class="v">${e.avgRate.toFixed(2)}%</div><div class="l">Average per Post</div></div>
+      <div class="stat-box"><div class="v">${e.best ? e.best.engagementRate.toFixed(2)+'%' : '—'}</div><div class="l">Best Single Post${e.best ? ' ('+new Date(e.best.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+')' : ''}</div></div>
+    `;
+
+    // 05 Outreach — start with 3 blank rows
+    document.getElementById('outreach-body').innerHTML = '';
+    for(let i=0;i<3;i++) addOutreachRow();
+
+    // 06 Goals
+    document.getElementById('goals-body').innerHTML = GOAL_TEMPLATE.map((g,i) => `
+      <tr>
+        <td>${g}</td>
+        <td><select class="goal-status" onchange="updateGoalCounts()" id="goal-status-${i}">
+          <option value="not_started">⬜ Not started</option>
+          <option value="in_progress">🔄 In progress</option>
+          <option value="done">✅ Done</option>
+        </select></td>
+        <td contenteditable="true" data-placeholder="notes…"></td>
+      </tr>
+    `).join('');
+    updateGoalCounts();
+
+    // 07/08 pre-fill a starting suggestion the team can edit
+    const bestPost = e.best;
+    const worstPost = e.worst;
+    document.getElementById('f-worked').textContent = bestPost
+      ? `The ${new Date(bestPost.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} post led the week with ${fmtNum(bestPost.reach)} reach and a ${bestPost.engagementRate.toFixed(1)}% engagement rate — worth noting what made it resonate.`
+      : '';
+    document.getElementById('f-notworked').textContent = worstPost
+      ? `The ${new Date(worstPost.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} post had the lowest reach this week (${fmtNum(worstPost.reach)}) — worth noting why.`
+      : '';
+
+    // 09 Priorities — start with 2 blank
+    document.getElementById('priorities-list').innerHTML = '';
+    addPriorityRow(); addPriorityRow();
+  }
+
+  function addOutreachRow(){
+    document.getElementById('outreach-body').insertAdjacentHTML('beforeend', `
+      <tr><td contenteditable="true" data-placeholder="e.g. Instagram accounts that responded"></td>
+      <td contenteditable="true" data-placeholder="e.g. 7 accounts replied…"></td></tr>
+    `);
+  }
+  function addPriorityRow(){
+    document.getElementById('priorities-list').insertAdjacentHTML('beforeend',
+      `<li contenteditable="true" data-placeholder="type a priority…" style="margin-bottom:6px;"></li>`);
+  }
+  function updateGoalCounts(){
+    let done = 0, progress = 0;
+    GOAL_TEMPLATE.forEach((_, i) => {
+      const v = document.getElementById(`goal-status-${i}`).value;
+      if(v === 'done') done++;
+      if(v === 'in_progress') progress++;
+    });
+    document.getElementById('goals-met').textContent = done;
+    document.getElementById('goals-progress').textContent = progress;
+  }
+
+  async function downloadPdf(){
+    const reportEl = document.getElementById('report');
+    setStatus('Rendering PDF…');
+    try{
+      const canvas = await html2canvas(reportEl, { scale: 2, backgroundColor: '#FBF8F3' });
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Paginate if the report is taller than one A4 page
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const since = document.getElementById('since-input').value;
+      const until = document.getElementById('until-input').value;
+      pdf.save(`LFC-Instagram-Weekly-${since}_to_${until}.pdf`);
+      setStatus('Downloaded ✓');
+    }catch(err){
+      setStatus(`PDF generation failed: ${escapeHtml(err.message)}`, true);
+    }
+  }
+
+  function fmtNum(n){ return (typeof n === 'number') ? n.toLocaleString('en-IN') : (n ?? '—'); }
+  function fmtDate(d){ return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+  function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  setPreset(7);
+</script>
+
+</body>
+</html>
