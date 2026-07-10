@@ -63,8 +63,8 @@
   .empty-state b{color:var(--purple-dark);}
 
   .lfc-name{font-family:'Lora',serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:var(--purple-dark);text-align:center;}
-  .r-title{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--purple-dark);margin:4px 0 10px;line-height:1.25;text-align:center;}
-  .r-meta{font-size:14px;color:var(--muted);margin-bottom:4px;}
+  .r-title{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--purple-dark);margin:4px 0 18px;line-height:1.25;text-align:center;}
+  .r-meta{font-size:14px;color:var(--muted);margin-bottom:6px;}
   .r-meta input{border:none;border-bottom:1px dashed var(--paper-line);background:transparent;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);width:160px;}
   .r-divider{height:2px;background:linear-gradient(90deg,var(--purple),var(--orange));margin:16px 0 20px;border-radius:2px;}
 
@@ -169,6 +169,12 @@
         <!-- 04 -->
         <div class="section-title">04 — Engagement Rate 📈</div>
         <div class="section-hint">Formula: (Likes + Comments + Saves + Shares) ÷ Reach × 100</div>
+        <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Reach</th><th>Engagement</th><th>Engagement Rate</th></tr></thead>
+          <tbody id="engagement-table-body"></tbody>
+        </table>
+        </div>
         <div class="stat-strip" id="engagement-stats"></div>
         <div class="chart-box"><canvas id="engagement-chart"></canvas></div>
 
@@ -325,6 +331,14 @@
 
     // 04 Engagement rate
     const e = data.engagement;
+    document.getElementById('engagement-table-body').innerHTML = (data.posts.length ? data.posts.map(p => `
+      <tr>
+        <td>${new Date(p.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
+        <td class="num">${fmtNum(p.reach)}</td>
+        <td class="num">${fmtNum(p.engagement)}</td>
+        <td class="num">${p.engagementRate.toFixed(2)}%</td>
+      </tr>
+    `).join('') : `<tr><td colspan="4" style="text-align:center;color:var(--muted);">No posts in this range</td></tr>`);
     document.getElementById('engagement-stats').innerHTML = `
       <div class="stat-box"><div class="v">${e.overallRate.toFixed(2)}%</div><div class="l">Overall Weekly Rate</div></div>
       <div class="stat-box"><div class="v">${e.avgRate.toFixed(2)}%</div><div class="l">Average per Post</div></div>
@@ -332,14 +346,17 @@
     `;
     renderEngagementChart(data.posts);
 
-    // 05 Outreach — start with 1 blank row
+    // 05 Outreach — start with 1 sample row to show the expected format
     document.getElementById('outreach-body').innerHTML = '';
-    addOutreachRow();
+    addOutreachRow('e.g. Instagram accounts that responded', 'e.g. 5 accounts replied to our story outreach');
 
     // 06 Goals — reset to the default 7, each deletable, plus an Add Goal button
     goalRowCounter = 0;
     document.getElementById('goals-body').innerHTML = '';
-    GOAL_TEMPLATE.forEach(g => addGoalRow(g, false));
+    GOAL_TEMPLATE.forEach((g, i) => {
+      if(i === 0) addGoalRow(g, false, 'in_progress', 'e.g. 2 NPOs reached out this month, awaiting reply');
+      else addGoalRow(g, false);
+    });
     updateGoalCounts();
 
     // 07/08 pre-fill a starting suggestion the team can edit
@@ -347,14 +364,14 @@
     const worstPost = e.worst;
     document.getElementById('f-worked').textContent = bestPost
       ? `The ${new Date(bestPost.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} post led the week with ${fmtNum(bestPost.reach)} reach and a ${bestPost.engagementRate.toFixed(1)}% engagement rate — worth noting what made it resonate.`
-      : '';
+      : 'e.g. The carousel post about our letter-writing drive led the week — timely topic and a strong opening slide likely helped.';
     document.getElementById('f-notworked').textContent = worstPost
       ? `The ${new Date(worstPost.date).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} post had the lowest reach this week (${fmtNum(worstPost.reach)}) — worth noting why.`
-      : '';
+      : 'e.g. The plain text update post underperformed — likely needed a stronger visual to stop the scroll.';
 
-    // 09 Priorities — start with 1 blank
+    // 09 Priorities — start with 1 sample row to show the expected format
     document.getElementById('priorities-list').innerHTML = '';
-    addPriorityRow();
+    addPriorityRow('e.g. Follow up with the shortlisted NPOs for a collab post');
   }
 
   /* ---------- Charts ---------- */
@@ -432,11 +449,11 @@
 
   /* ---------- Outreach rows (start with 1, addable, deletable) ---------- */
 
-  function addOutreachRow(){
+  function addOutreachRow(sampleActivity = '', sampleDetail = ''){
     document.getElementById('outreach-body').insertAdjacentHTML('beforeend', `
       <tr>
-        <td contenteditable="true" data-placeholder="e.g. Instagram accounts that responded"></td>
-        <td contenteditable="true" data-placeholder="e.g. 7 accounts replied…"></td>
+        <td contenteditable="true" data-placeholder="e.g. Instagram accounts that responded">${escapeHtml(sampleActivity)}</td>
+        <td contenteditable="true" data-placeholder="e.g. 7 accounts replied…">${escapeHtml(sampleDetail)}</td>
         <td><button class="del-row-btn" onclick="this.closest('tr').remove()">✕</button></td>
       </tr>
     `);
@@ -444,10 +461,10 @@
 
   /* ---------- Priorities (start with 1, addable, deletable) ---------- */
 
-  function addPriorityRow(){
+  function addPriorityRow(sampleText = ''){
     document.getElementById('priorities-list').insertAdjacentHTML('beforeend', `
       <li style="margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;list-style:decimal;">
-        <span contenteditable="true" data-placeholder="type a priority…" style="flex:1;border-bottom:1px dashed var(--paper-line);padding:2px 1px;"></span>
+        <span contenteditable="true" data-placeholder="type a priority…" style="flex:1;border-bottom:1px dashed var(--paper-line);padding:2px 1px;">${escapeHtml(sampleText)}</span>
         <button class="del-row-btn" onclick="this.closest('li').remove()">✕</button>
       </li>
     `);
@@ -455,7 +472,7 @@
 
   /* ---------- Monthly goals (default 7 shown, addable, deletable; success threshold fixed at 3) ---------- */
 
-  function addGoalRow(goalText = '', editable = true){
+  function addGoalRow(goalText = '', editable = true, sampleStatus = 'not_started', sampleNote = ''){
     const id = goalRowCounter++;
     const goalCell = editable
       ? `<td contenteditable="true" data-placeholder="type new criteria…" id="goal-name-${id}"></td>`
@@ -464,11 +481,11 @@
       <tr data-goal-row="${id}">
         ${goalCell}
         <td><select class="goal-status" onchange="updateGoalCounts()" id="goal-status-${id}">
-          <option value="not_started">⬜ Not started</option>
-          <option value="in_progress">🔄 In progress</option>
-          <option value="done">✅ Done</option>
+          <option value="not_started"${sampleStatus==='not_started'?' selected':''}>⬜ Not started</option>
+          <option value="in_progress"${sampleStatus==='in_progress'?' selected':''}>🔄 In progress</option>
+          <option value="done"${sampleStatus==='done'?' selected':''}>✅ Done</option>
         </select></td>
-        <td contenteditable="true" data-placeholder="notes…"></td>
+        <td contenteditable="true" data-placeholder="notes…">${escapeHtml(sampleNote)}</td>
         <td><button class="del-row-btn" onclick="removeGoalRow(this)">✕</button></td>
       </tr>
     `);
