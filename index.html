@@ -24,10 +24,10 @@
   .brand h1{font-family:'Lora',serif;font-size:18px;font-weight:600;margin:0;color:var(--purple-dark);line-height:1.25;}
   .brand p{margin:0;font-size:14px;color:var(--muted);}
 
-  main{max-width:1180px;margin:0 auto;padding:20px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px;width:100%;}
+  main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px;width:100%;}
   main, main > *{min-width:0;}
   @media (max-width:880px){
-    main{grid-template-columns:1fr;padding:16px 14px 50px;gap:16px;}
+    main{grid-template-columns:1fr;padding:8px 14px 50px;gap:16px;}
     header{padding:16px 14px;}
   }
   @media (max-width:1024px) and (min-width:881px){
@@ -105,7 +105,8 @@
   .view.active{display:block;}
 
   /* ---- Dashboard ---- */
-  #dashboard-main{max-width:1180px;margin:0 auto;padding:20px 20px 60px;}
+  #dashboard-main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;}
+  @media (max-width:880px){ #dashboard-main{padding:8px 14px 50px;} }
   .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   @media (max-width:880px){ .dash-grid{grid-template-columns:1fr;} }
   .dash-card{background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:18px;}
@@ -117,6 +118,36 @@
   .dash-stat .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;color:var(--purple-dark);}
   .dash-stat .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:4px;}
   .dash-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
+
+  /* ---- Polish: transitions, spinner, section headers ---- */
+  .view{animation:none;}
+  .view.active{animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .tab-btn{transition:background .15s,color .15s,border-color .15s;}
+  .dash-card{transition:box-shadow .15s;}
+  .dash-card:hover{box-shadow:0 4px 14px rgba(139,42,122,.08);}
+  .generate-btn,.download-btn,.add-row-btn,.del-row-btn,.preset-chip{transition:background .15s,opacity .15s,transform .1s;}
+  .add-row-btn:hover{background:var(--purple);color:#fff;}
+  .del-row-btn:hover{background:var(--bad);color:#fff;border-color:var(--bad);}
+  .preset-chip:hover{background:var(--purple);color:#fff;}
+  .generate-btn:not(:disabled):active,.download-btn:not(:disabled):active{transform:scale(.98);}
+
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--paper-line);border-top-color:var(--purple);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-row{display:flex;align-items:center;justify-content:center;padding:30px;color:var(--muted);font-size:14px;}
+
+  .dash-empty .big-icon{font-size:28px;display:block;margin-bottom:8px;opacity:.6;}
+
+  .section-header{max-width:1180px;margin:0 auto;padding:20px 20px 0;}
+  @media (max-width:880px){ .section-header{padding:16px 14px 0;} }
+  .section-header h2{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--purple-dark);margin:0 0 4px;}
+  .section-header p{font-size:14px;color:var(--muted);margin:0 0 14px;}
+
+  .subsection-label{font-family:'Lora',serif;font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 10px;}
+  .subsection-label:first-child{margin-top:0;}
+
+  .draft-note{font-size:12px;color:var(--purple-dark);background:var(--lavender);border-radius:6px;padding:4px 9px;display:inline-block;margin-bottom:10px;}
 
   /* ---- Monitoring feed items ---- */
   .feed-item{border-bottom:1px solid var(--paper-line);padding:10px 0;}
@@ -145,10 +176,17 @@
 
 <!-- ============ DASHBOARD VIEW ============ -->
 <div id="dashboard-view" class="view active">
+  <div class="section-header">
+    <h2>Dashboard</h2>
+    <p>LFC's Instagram growth over time, built from every Weekly Report you've pulled.</p>
+  </div>
   <main id="dashboard-main">
+    <div class="subsection-label">Overview</div>
     <div class="dash-summary" id="dash-summary">
-      <div class="dash-empty" style="grid-column:1/-1;">Loading history…</div>
+      <div class="dash-empty" style="grid-column:1/-1;"><span class="spinner"></span>Loading history…</div>
     </div>
+
+    <div class="subsection-label">Trends</div>
     <div class="dash-grid">
       <div class="dash-card">
         <h3>Followers Over Time</h3>
@@ -167,23 +205,25 @@
         <div class="dash-chart-box"><canvas id="dash-posts-chart"></canvas></div>
       </div>
     </div>
-    <div class="dash-card" style="margin-top:18px;">
-      <h3>History Log</h3>
+
+    <div class="subsection-label">History Log</div>
+    <div class="dash-card">
       <div class="table-scroll">
         <table class="data-table">
           <thead><tr><th>Period Ending</th><th>Followers</th><th>Following</th><th>Posts</th><th>Reach</th><th>Engagement Rate</th></tr></thead>
           <tbody id="dash-history-body"></tbody>
         </table>
       </div>
-      <button class="del-row-btn" style="margin-top:12px;padding:7px 12px;" onclick="clearHistory()">Clear all history</button>
-      <span style="font-size:13px;color:var(--muted);margin-left:8px;">Use this if old test-account data is mixed in with LFC's real numbers.</span>
-      <div id="clear-history-status" style="font-size:13px;color:var(--muted);margin-top:6px;"></div>
     </div>
   </main>
 </div>
 
 <!-- ============ WEEKLY REPORT VIEW ============ -->
 <div id="weekly-view" class="view">
+  <div class="section-header">
+    <h2>Weekly Report</h2>
+    <p>Pull the week's numbers, fill in the write-up sections, download a ready-to-share PDF.</p>
+  </div>
 <main>
   <section class="panel">
     <h2>Report Setup</h2>
@@ -217,6 +257,7 @@
         <div class="r-meta">📅 <span id="r-week-label">WEEK NUMBER — —</span></div>
         <div class="r-meta">📆 <span id="r-daterange">—</span></div>
         <div class="r-divider"></div>
+        <div class="draft-note" id="draft-restored-note" style="display:none;">✓ Restored your unsaved edits from last time</div>
 
         <!-- 01 -->
         <div class="section-title">01 — Week's Highlight ⭐</div>
@@ -307,8 +348,13 @@
 
 <!-- ============ MONITORING VIEW ============ -->
 <div id="monitoring-view" class="view">
-  <main id="monitoring-main" style="max-width:1180px;margin:0 auto;padding:20px 20px 60px;">
-    <div class="dash-card" style="margin-bottom:18px;">
+  <div class="section-header">
+    <h2>Monitoring</h2>
+    <p>Recent comments and DMs in one place — read-only, with keyword flags you control.</p>
+  </div>
+  <main id="monitoring-main" style="max-width:1180px;margin:0 auto;padding:8px 20px 60px;">
+    <div class="subsection-label">Settings</div>
+    <div class="dash-card">
       <h3>Flagged Keywords</h3>
       <p style="font-size:14px;color:var(--muted);margin:0 0 10px;">Comma-separated. Any comment or DM containing one of these gets flagged 🚩 below.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -318,18 +364,19 @@
       <div id="keywords-status" style="font-size:13px;color:var(--muted);margin-top:8px;"></div>
     </div>
 
-    <div style="margin-bottom:14px;">
-      <button class="generate-btn" style="width:auto;padding:12px 20px;" onclick="loadMonitoring()">Refresh comments &amp; DMs</button>
+    <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span>Live Feed</span>
+      <button class="generate-btn" style="width:auto;padding:9px 16px;margin:0;font-size:14px;" onclick="loadMonitoring()">Refresh comments &amp; DMs</button>
     </div>
 
     <div class="dash-grid">
       <div class="dash-card">
         <h3>Recent Comments</h3>
-        <div id="comments-list"><div class="dash-empty">Click Refresh to load.</div></div>
+        <div id="comments-list"><div class="dash-empty"><span class="big-icon">💬</span>Click Refresh to load recent comments.</div></div>
       </div>
       <div class="dash-card">
         <h3>Recent DMs</h3>
-        <div id="messages-list"><div class="dash-empty">Click Refresh to load.</div></div>
+        <div id="messages-list"><div class="dash-empty"><span class="big-icon">✉️</span>Click Refresh to load recent DMs.</div></div>
       </div>
     </div>
   </main>
@@ -352,19 +399,6 @@
   }
 
   let dashCharts = {};
-  async function clearHistory(){
-    if(!confirm('This permanently deletes ALL saved history (used for trend charts and week-over-week comparison). Use this only to remove old test-account data. Continue?')) return;
-    const statusEl = document.getElementById('clear-history-status');
-    statusEl.textContent = 'Clearing…';
-    try{
-      const res = await fetch(`${WORKER_URL}/history/clear?key=${encodeURIComponent(teamKey)}`);
-      const data = await res.json();
-      statusEl.textContent = `Cleared ${data.cleared} saved period(s). Pull a fresh Weekly Report to start building clean history.`;
-      loadDashboard();
-    }catch(err){
-      statusEl.textContent = `Couldn't clear: ${escapeHtml(err.message)}`;
-    }
-  }
 
   async function loadDashboard(){
     const summaryEl = document.getElementById('dash-summary');
@@ -372,7 +406,7 @@
       const res = await fetch(`${WORKER_URL}/history?key=${encodeURIComponent(teamKey)}`);
       const history = await res.json();
       if(!Array.isArray(history) || history.length === 0){
-        summaryEl.innerHTML = `<div class="dash-empty" style="grid-column:1/-1;">No history yet — pull a Weekly Report at least once to start building trends.</div>`;
+        summaryEl.innerHTML = `<div class="dash-empty" style="grid-column:1/-1;"><span class="big-icon">📈</span>No history yet — pull a Weekly Report at least once to start building trends.</div>`;
         document.getElementById('dash-history-body').innerHTML = '';
         return;
       }
@@ -459,8 +493,8 @@
   async function loadMonitoring(){
     const commentsEl = document.getElementById('comments-list');
     const messagesEl = document.getElementById('messages-list');
-    commentsEl.innerHTML = `<div class="dash-empty">Loading…</div>`;
-    messagesEl.innerHTML = `<div class="dash-empty">Loading…</div>`;
+    commentsEl.innerHTML = `<div class="loading-row"><span class="spinner"></span>Loading comments…</div>`;
+    messagesEl.innerHTML = `<div class="loading-row"><span class="spinner"></span>Loading DMs…</div>`;
 
     try{
       const res = await fetch(`${WORKER_URL}/comments?key=${encodeURIComponent(teamKey)}`);
@@ -468,7 +502,7 @@
       if(data.error){
         commentsEl.innerHTML = `<div class="dash-empty">${escapeHtml(data.error)}${data.reconnect ? ` <a href="${WORKER_URL}${data.reconnect}" target="_blank">Reconnect →</a>`:''}</div>`;
       } else if(!data.comments || data.comments.length === 0){
-        commentsEl.innerHTML = `<div class="dash-empty">No recent comments found.</div>`;
+        commentsEl.innerHTML = `<div class="dash-empty"><span class="big-icon">💬</span>No recent comments found.</div>`;
       } else {
         commentsEl.innerHTML = data.comments.map(c => `
           <div class="feed-item${c.flagged ? ' flagged' : ''}">
@@ -491,7 +525,7 @@
       } else if(data.messagingUnavailable){
         messagesEl.innerHTML = `<div class="dash-empty">DM access isn't available yet — this usually means Meta needs one more approval step for messaging permissions (separate from comments/insights). Comments monitoring still works normally.</div>`;
       } else if(!data.messages || data.messages.length === 0){
-        messagesEl.innerHTML = `<div class="dash-empty">No recent DMs found.</div>`;
+        messagesEl.innerHTML = `<div class="dash-empty"><span class="big-icon">✉️</span>No recent DMs found.</div>`;
       } else {
         messagesEl.innerHTML = data.messages.map(m => `
           <div class="feed-item${m.flagged ? ' flagged' : ''}">
@@ -549,7 +583,7 @@
 
     const btn = document.getElementById('generate-btn');
     btn.disabled = true;
-    setStatus('Fetching data from Instagram…');
+    setStatus('<span class="spinner"></span>Fetching data from Instagram…');
 
     try{
       const res = await fetch(`${WORKER_URL}/instagram?since=${since}&until=${until}&key=${encodeURIComponent(teamKey)}`);
@@ -658,6 +692,79 @@
     // 09 Priorities — start with 1 sample row to show the expected format
     document.getElementById('priorities-list').innerHTML = '';
     addPriorityRow('e.g. Follow up with the shortlisted NPOs for a collab post');
+
+    // Restore any unsaved draft for this exact date range, if one exists
+    currentDraftKey = draftKey(since, until);
+    const draft = loadDraft(since, until);
+    document.getElementById('draft-restored-note').style.display = draft ? 'block' : 'none';
+    if(draft) restoreDraft(draft);
+  }
+
+  /* ---------- Draft auto-save (so typed text survives a closed tab) ---------- */
+
+  let currentDraftKey = null;
+  let draftSaveTimer = null;
+
+  function draftKey(since, until){ return `lfc_draft_${since}_${until}`; }
+
+  function saveDraftDebounced(){
+    clearTimeout(draftSaveTimer);
+    draftSaveTimer = setTimeout(saveDraftNow, 500);
+  }
+
+  function saveDraftNow(){
+    if(!currentDraftKey) return;
+    try{ localStorage.setItem(currentDraftKey, JSON.stringify(collectDraft())); }catch(_){ /* storage full/unavailable — non-critical */ }
+  }
+
+  function loadDraft(since, until){
+    try{
+      const raw = localStorage.getItem(draftKey(since, until));
+      return raw ? JSON.parse(raw) : null;
+    }catch(_){ return null; }
+  }
+
+  function collectDraft(){
+    const outreach = [...document.querySelectorAll('#outreach-body tr')].map(tr => ({
+      activity: tr.children[0]?.textContent.trim() || '',
+      detail: tr.children[1]?.textContent.trim() || '',
+    }));
+    const goals = [...document.querySelectorAll('#goals-body tr')].map(tr => ({
+      name: tr.children[0]?.textContent.trim() || '',
+      editable: tr.children[0]?.hasAttribute('contenteditable') || false,
+      status: tr.querySelector('.goal-status')?.value || 'not_started',
+      note: tr.children[2]?.textContent.trim() || '',
+    }));
+    const priorities = [...document.querySelectorAll('#priorities-list li')].map(li =>
+      li.querySelector('span')?.textContent.trim() || ''
+    );
+    return {
+      highlight: document.getElementById('f-highlight')?.textContent || '',
+      worked: document.getElementById('f-worked')?.textContent || '',
+      notworked: document.getElementById('f-notworked')?.textContent || '',
+      outreach, goals, priorities,
+    };
+  }
+
+  function restoreDraft(draft){
+    if(typeof draft.highlight === 'string') document.getElementById('f-highlight').textContent = draft.highlight;
+    if(typeof draft.worked === 'string') document.getElementById('f-worked').textContent = draft.worked;
+    if(typeof draft.notworked === 'string') document.getElementById('f-notworked').textContent = draft.notworked;
+
+    if(Array.isArray(draft.outreach) && draft.outreach.length){
+      document.getElementById('outreach-body').innerHTML = '';
+      draft.outreach.forEach(o => addOutreachRow(o.activity, o.detail));
+    }
+    if(Array.isArray(draft.goals) && draft.goals.length){
+      goalRowCounter = 0;
+      document.getElementById('goals-body').innerHTML = '';
+      draft.goals.forEach(g => addGoalRow(g.name, g.editable, g.status, g.note));
+      updateGoalCounts();
+    }
+    if(Array.isArray(draft.priorities) && draft.priorities.length){
+      document.getElementById('priorities-list').innerHTML = '';
+      draft.priorities.forEach(p => addPriorityRow(p));
+    }
   }
 
   /* ---------- Charts ---------- */
@@ -740,7 +847,7 @@
       <tr>
         <td contenteditable="true" data-placeholder="e.g. Instagram accounts that responded">${escapeHtml(sampleActivity)}</td>
         <td contenteditable="true" data-placeholder="e.g. 7 accounts replied…">${escapeHtml(sampleDetail)}</td>
-        <td><button class="del-row-btn" onclick="this.closest('tr').remove()">✕</button></td>
+        <td><button class="del-row-btn" onclick="this.closest('tr').remove(); saveDraftDebounced();">✕</button></td>
       </tr>
     `);
   }
@@ -751,7 +858,7 @@
     document.getElementById('priorities-list').insertAdjacentHTML('beforeend', `
       <li style="margin-bottom:6px;display:flex;align-items:flex-start;gap:8px;list-style:decimal;">
         <span contenteditable="true" data-placeholder="type a priority…" style="flex:1;border-bottom:1px dashed var(--paper-line);padding:2px 1px;">${escapeHtml(sampleText)}</span>
-        <button class="del-row-btn" onclick="this.closest('li').remove()">✕</button>
+        <button class="del-row-btn" onclick="this.closest('li').remove(); saveDraftDebounced();">✕</button>
       </li>
     `);
   }
@@ -761,12 +868,12 @@
   function addGoalRow(goalText = '', editable = true, sampleStatus = 'not_started', sampleNote = ''){
     const id = goalRowCounter++;
     const goalCell = editable
-      ? `<td contenteditable="true" data-placeholder="type new criteria…" id="goal-name-${id}"></td>`
+      ? `<td contenteditable="true" data-placeholder="type new criteria…" id="goal-name-${id}">${escapeHtml(goalText)}</td>`
       : `<td id="goal-name-${id}">${escapeHtml(goalText)}</td>`;
     document.getElementById('goals-body').insertAdjacentHTML('beforeend', `
       <tr data-goal-row="${id}">
         ${goalCell}
-        <td><select class="goal-status" onchange="updateGoalCounts()" id="goal-status-${id}">
+        <td><select class="goal-status" onchange="updateGoalCounts(); saveDraftDebounced();" id="goal-status-${id}">
           <option value="not_started"${sampleStatus==='not_started'?' selected':''}>⬜ Not started</option>
           <option value="in_progress"${sampleStatus==='in_progress'?' selected':''}>🔄 In progress</option>
           <option value="done"${sampleStatus==='done'?' selected':''}>✅ Done</option>
@@ -781,6 +888,7 @@
   function removeGoalRow(btn){
     btn.closest('tr').remove();
     updateGoalCounts();
+    saveDraftDebounced();
   }
 
   function updateGoalCounts(){
@@ -799,7 +907,7 @@
 
   async function downloadPdf(){
     const reportEl = document.getElementById('report');
-    setStatus('Rendering PDF…');
+    setStatus('<span class="spinner"></span>Rendering PDF…');
     try{
       const canvas = await html2canvas(reportEl, { scale: 2, backgroundColor: '#FBF8F3' });
       const imgData = canvas.toDataURL('image/png');
@@ -837,6 +945,7 @@
 
   setPreset(7);
   initApp(); // passcode gate disabled for now — loads straight in
+  document.getElementById('report').addEventListener('input', saveDraftDebounced);
 </script>
 
 </body>
