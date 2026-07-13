@@ -175,6 +175,9 @@
           <tbody id="dash-history-body"></tbody>
         </table>
       </div>
+      <button class="del-row-btn" style="margin-top:12px;padding:7px 12px;" onclick="clearHistory()">Clear all history</button>
+      <span style="font-size:13px;color:var(--muted);margin-left:8px;">Use this if old test-account data is mixed in with LFC's real numbers.</span>
+      <div id="clear-history-status" style="font-size:13px;color:var(--muted);margin-top:6px;"></div>
     </div>
   </main>
 </div>
@@ -349,6 +352,20 @@
   }
 
   let dashCharts = {};
+  async function clearHistory(){
+    if(!confirm('This permanently deletes ALL saved history (used for trend charts and week-over-week comparison). Use this only to remove old test-account data. Continue?')) return;
+    const statusEl = document.getElementById('clear-history-status');
+    statusEl.textContent = 'Clearing…';
+    try{
+      const res = await fetch(`${WORKER_URL}/history/clear?key=${encodeURIComponent(teamKey)}`);
+      const data = await res.json();
+      statusEl.textContent = `Cleared ${data.cleared} saved period(s). Pull a fresh Weekly Report to start building clean history.`;
+      loadDashboard();
+    }catch(err){
+      statusEl.textContent = `Couldn't clear: ${escapeHtml(err.message)}`;
+    }
+  }
+
   async function loadDashboard(){
     const summaryEl = document.getElementById('dash-summary');
     try{
