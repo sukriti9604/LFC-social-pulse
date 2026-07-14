@@ -17,8 +17,8 @@
   }
   *{box-sizing:border-box;}
   html{-webkit-text-size-adjust:100%;overflow-x:hidden;}
-  body{margin:0;font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--ink);background:linear-gradient(180deg,var(--lavender) 0%, #fff 380px);min-height:100vh;overflow-x:hidden;width:100%;}
-  header{padding:0 20px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;gap:0;position:sticky;top:0;z-index:100;}
+  body{margin:0;font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--ink);background:linear-gradient(180deg,var(--lavender) 0%, #fff 380px);min-height:100vh;overflow-x:hidden;width:100%;padding-top:56px;}
+  header{height:56px;padding:0 20px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;gap:0;position:fixed;top:0;left:0;right:0;z-index:100;}
   .brand{display:flex;align-items:center;gap:10px;padding:10px 0;border-right:1px solid var(--paper-line);margin-right:4px;padding-right:20px;}
   .brand-mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:700;color:#fff;font-size:13px;flex-shrink:0;}
   .brand h1{font-family:'Lora',serif;font-size:15px;font-weight:600;margin:0;color:var(--purple-dark);line-height:1.2;}
@@ -29,6 +29,14 @@
   @media (max-width:880px){
     main{grid-template-columns:1fr;padding:8px 14px 50px;gap:16px;}
     header{padding:0 14px;}
+  }
+  @media (max-width:700px){
+    body{padding-top:96px;}
+    header{height:auto;flex-wrap:wrap;padding:8px 14px;}
+  }
+  @media (max-width:640px){
+    .tab-nav{margin-left:0;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;}
+    .tab-btn{white-space:nowrap;flex-shrink:0;}
   }
   @media (max-width:1024px) and (min-width:881px){
     main{grid-template-columns:260px 1fr;}
@@ -103,8 +111,17 @@
   .tab-btn{padding:0 16px;border-radius:0;border:none;border-bottom:3px solid transparent;background:transparent;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;margin-bottom:-1px;}
   .tab-btn.active{color:var(--purple-dark);border-bottom-color:var(--purple);}
   .tab-btn:hover:not(.active){color:var(--purple-dark);background:var(--lavender);}
+  .tab-btn.subsection{font-size:12px;color:var(--muted);}
+  .tab-btn.subsection:hover{color:var(--purple-dark);background:var(--lavender);}
+  .tab-btn.subsection.active{color:var(--purple-dark);border-bottom-color:var(--orange);}
+  .tab-btn.hidden{display:none;}
+  .tab-divider{width:1px;background:var(--paper-line);margin:10px 6px;display:block;}
+  .tab-divider.hidden{display:none;}
   .view{display:none;}
   .view.active{display:block;}
+  @media (max-width:1024px){
+    .tab-btn.subsection{padding:0 10px;font-size:11.5px;}
+  }
 
   /* ---- Dashboard ---- */
   #dashboard-main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;}
@@ -175,6 +192,11 @@
       <button class="tab-btn active" id="tab-btn-dashboard" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" id="tab-btn-weekly" onclick="switchTab('weekly')">Weekly Report</button>
       <button class="tab-btn" id="tab-btn-monitoring" onclick="switchTab('monitoring')">Monitoring</button>
+      <span class="tab-divider" id="tab-divider"></span>
+      <button class="tab-btn subsection hidden" id="tab-btn-post-performance" onclick="scrollToSection('post-performance-section')">Post Performance</button>
+      <button class="tab-btn subsection hidden" id="tab-btn-engagement-rate" onclick="scrollToSection('engagement-rate-section')">Engagement Rate</button>
+      <button class="tab-btn subsection hidden" id="tab-btn-audience-demographics" onclick="scrollToSection('audience-demographics-section')">Audience Demographics</button>
+      <button class="tab-btn subsection hidden" id="tab-btn-weekly-report" onclick="scrollToSection('weekly-report-top')">Weekly Report</button>
     </div>
   </div>
 </header>
@@ -225,7 +247,7 @@
 
 <!-- ============ WEEKLY REPORT VIEW ============ -->
 <div id="weekly-view" class="view">
-  <div class="section-header">
+  <div class="section-header" id="weekly-report-top">
     <h2>Weekly Report</h2>
     <p>Pull the week's numbers, fill in the write-up sections, download a ready-to-share PDF.</p>
   </div>
@@ -285,7 +307,7 @@
         <div class="stat-strip cols-2" id="account-activity-stats"></div>
 
         <!-- 04 -->
-        <div class="section-title">04 — Post Performance 📊</div>
+        <div class="section-title" id="post-performance-section">04 — Post Performance 📊</div>
         <div class="table-scroll">
         <table class="data-table">
           <thead><tr><th>Date</th><th>Type</th><th>Reach</th><th>Likes</th><th>Comments</th><th>Saves</th><th>Shares</th><th>Notes</th></tr></thead>
@@ -295,7 +317,7 @@
         <div class="chart-box"><canvas id="post-chart"></canvas></div>
 
         <!-- 05 -->
-        <div class="section-title">05 — Engagement Rate 📈</div>
+        <div class="section-title" id="engagement-rate-section">05 — Engagement Rate 📈</div>
         <div class="section-hint">Formula: (Likes + Comments + Saves + Shares) ÷ Reach × 100</div>
         <div class="table-scroll">
         <table class="data-table">
@@ -307,7 +329,7 @@
         <div class="chart-box"><canvas id="engagement-chart"></canvas></div>
 
         <!-- 06 -->
-        <div class="section-title">06 — Audience Demographics 🧑‍🤝‍🧑</div>
+        <div class="section-title" id="audience-demographics-section">06 — Audience Demographics 🧑‍🤝‍🧑</div>
         <div class="section-hint">Follower breakdown by gender, age, and top countries. Needs 100+ followers to populate.</div>
         <div id="demographics-content">
           <div class="table-scroll">
@@ -415,8 +437,39 @@
     document.getElementById('tab-btn-dashboard').classList.toggle('active', tab === 'dashboard');
     document.getElementById('tab-btn-weekly').classList.toggle('active', tab === 'weekly');
     document.getElementById('tab-btn-monitoring').classList.toggle('active', tab === 'monitoring');
+
+    const showSubtabs = tab === 'weekly';
+    document.getElementById('tab-divider').classList.toggle('hidden', !showSubtabs);
+    ['post-performance','engagement-rate','audience-demographics','weekly-report'].forEach(id => {
+      document.getElementById('tab-btn-' + id).classList.toggle('hidden', !showSubtabs);
+    });
+    if(!showSubtabs) clearSubsectionActive();
+
     if(tab === 'dashboard') loadDashboard();
     if(tab === 'monitoring') loadKeywords();
+  }
+
+  function clearSubsectionActive(){
+    document.querySelectorAll('.tab-btn.subsection').forEach(b => b.classList.remove('active'));
+  }
+
+  function scrollToSection(id){
+    if(!document.getElementById('weekly-view').classList.contains('active')) switchTab('weekly');
+    const el = document.getElementById(id);
+    if(!el) return;
+    const headerOffset = window.innerWidth <= 700 ? 106 : 66;
+    const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+
+    clearSubsectionActive();
+    const map = {
+      'post-performance-section':'tab-btn-post-performance',
+      'engagement-rate-section':'tab-btn-engagement-rate',
+      'audience-demographics-section':'tab-btn-audience-demographics',
+      'weekly-report-top':'tab-btn-weekly-report'
+    };
+    const btn = document.getElementById(map[id]);
+    if(btn) btn.classList.add('active');
   }
 
   let dashCharts = {};
