@@ -195,7 +195,6 @@
       <span class="tab-divider" id="tab-divider"></span>
       <button class="tab-btn subsection hidden" id="tab-btn-post-performance" onclick="scrollToSection('post-performance-section')">Post Performance</button>
       <button class="tab-btn subsection hidden" id="tab-btn-engagement-rate" onclick="scrollToSection('engagement-rate-section')">Engagement Rate</button>
-      <button class="tab-btn subsection hidden" id="tab-btn-audience-demographics" onclick="scrollToSection('audience-demographics-section')">Audience Demographics</button>
     </div>
   </div>
 </header>
@@ -241,6 +240,34 @@
         </table>
       </div>
     </div>
+
+    <div class="subsection-label" id="account-reach-section">03 — Account Reach &amp; Profile Activity 📶</div>
+    <div class="section-hint">Account-level reach (everywhere, not just posts) and actions taken on the profile itself, from the most recent 7-day pull.</div>
+    <div class="stat-strip cols-2" id="account-activity-stats"></div>
+
+    <div class="subsection-label" id="audience-demographics-section">06 — Audience Demographics 🧑‍🤝‍🧑</div>
+    <div class="section-hint">Follower breakdown by gender, age, and top countries, from the most recent 7-day pull.</div>
+    <div id="demographics-content">
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Gender</th><th>Share of Followers</th></tr></thead>
+          <tbody id="demo-gender-body"></tbody>
+        </table>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Age Range</th><th>Share of Followers</th></tr></thead>
+          <tbody id="demo-age-body"></tbody>
+        </table>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Top Countries</th><th>Followers</th></tr></thead>
+          <tbody id="demo-country-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="demographics-empty" style="display:none;font-size:14px;color:var(--muted);font-style:italic;">Audience demographics aren't available yet — this usually means the account has fewer than 100 followers, or Meta hasn't finished computing it yet.</div>
   </main>
 </div>
 
@@ -269,7 +296,6 @@
     <button class="generate-btn" id="generate-btn" onclick="generateReport()">Pull Data</button>
     <button class="download-btn" id="download-btn" onclick="downloadPdf()" disabled>Download PDF</button>
     <div class="status" id="status-text"></div>
-    <div class="hint">Data pulls automatically. Sections 01, 07–08 need your input before downloading — click into any dashed line in the preview to type.</div>
   </section>
 
   <section id="report-wrap">
@@ -300,11 +326,6 @@
         </div>
         <div class="chart-box"><canvas id="follower-chart"></canvas></div>
 
-        <!-- 03 -->
-        <div class="section-title">03 — Account Reach &amp; Profile Activity 📶</div>
-        <div class="section-hint">Account-level reach (everywhere, not just posts) and actions taken on the profile itself.</div>
-        <div class="stat-strip cols-2" id="account-activity-stats"></div>
-
         <!-- 04 -->
         <div class="section-title" id="post-performance-section">04 — Post Performance 📊</div>
         <div class="table-scroll">
@@ -326,31 +347,6 @@
         </div>
         <div class="stat-strip" id="engagement-stats"></div>
         <div class="chart-box"><canvas id="engagement-chart"></canvas></div>
-
-        <!-- 06 -->
-        <div class="section-title" id="audience-demographics-section">06 — Audience Demographics 🧑‍🤝‍🧑</div>
-        <div class="section-hint">Follower breakdown by gender, age, and top countries.</div>
-        <div id="demographics-content">
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr><th>Gender</th><th>Share of Followers</th></tr></thead>
-              <tbody id="demo-gender-body"></tbody>
-            </table>
-          </div>
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr><th>Age Range</th><th>Share of Followers</th></tr></thead>
-              <tbody id="demo-age-body"></tbody>
-            </table>
-          </div>
-          <div class="table-scroll">
-            <table class="data-table">
-              <thead><tr><th>Top Countries</th><th>Followers</th></tr></thead>
-              <tbody id="demo-country-body"></tbody>
-            </table>
-          </div>
-        </div>
-        <div id="demographics-empty" style="display:none;font-size:14px;color:var(--muted);font-style:italic;">Audience demographics aren't available yet — this usually means the account has fewer than 100 followers, or Meta hasn't finished computing it yet.</div>
 
         <!-- 07 -->
         <div class="section-title">07 — Outreach &amp; Engagement 💬</div>
@@ -439,7 +435,7 @@
 
     const showSubtabs = tab === 'weekly';
     document.getElementById('tab-divider').classList.toggle('hidden', !showSubtabs);
-    ['post-performance','engagement-rate','audience-demographics'].forEach(id => {
+    ['post-performance','engagement-rate'].forEach(id => {
       document.getElementById('tab-btn-' + id).classList.toggle('hidden', !showSubtabs);
     });
     if(!showSubtabs) clearSubsectionActive();
@@ -453,7 +449,9 @@
   }
 
   function scrollToSection(id){
-    if(!document.getElementById('weekly-view').classList.contains('active')) switchTab('weekly');
+    const isWeeklySection = (id === 'post-performance-section' || id === 'engagement-rate-section');
+    if(isWeeklySection && !document.getElementById('weekly-view').classList.contains('active')) switchTab('weekly');
+    else if(!isWeeklySection && !document.getElementById('dashboard-view').classList.contains('active')) switchTab('dashboard');
     const el = document.getElementById(id);
     if(!el) return;
     const headerOffset = window.innerWidth <= 700 ? 114 : 78;
@@ -463,8 +461,7 @@
     clearSubsectionActive();
     const map = {
       'post-performance-section':'tab-btn-post-performance',
-      'engagement-rate-section':'tab-btn-engagement-rate',
-      'audience-demographics-section':'tab-btn-audience-demographics'
+      'engagement-rate-section':'tab-btn-engagement-rate'
     };
     const btn = document.getElementById(map[id]);
     if(btn) btn.classList.add('active');
@@ -513,6 +510,19 @@
     }catch(err){
       summaryEl.innerHTML = `<div class="dash-empty" style="grid-column:1/-1;">Couldn't load history: ${escapeHtml(err.message)}</div>`;
     }
+
+    // 03 & 06 — Account Reach and Audience Demographics, latest 7-day window
+    try{
+      const until = new Date();
+      const since = new Date();
+      since.setDate(since.getDate() - 6);
+      const res2 = await fetch(`${WORKER_URL}/instagram?since=${since.toISOString().slice(0,10)}&until=${until.toISOString().slice(0,10)}&key=${encodeURIComponent(teamKey)}`);
+      const latestData = await res2.json();
+      if(!latestData.error){
+        renderAccountActivity(latestData.accountActivity);
+        renderDemographics(latestData.audienceDemographics);
+      }
+    }catch(_){ /* non-critical for dashboard */ }
   }
 
   function drawDashChart(canvasId, type, labels, datasets, showLegend=false){
@@ -708,8 +718,7 @@
     }
     renderFollowerChart(fg);
 
-    // 03 Account reach & profile activity
-    renderAccountActivity(data.accountActivity);
+    // 03 Account reach & profile activity — now shown on Dashboard
 
     // 04 Post performance
     const typeLabel = (t) => ({IMAGE:'Image', VIDEO:'Video', CAROUSEL_ALBUM:'Carousel', REELS:'Reel', FEED:'Post', STORY:'Story'}[t] || t || '—');
@@ -744,8 +753,7 @@
     `;
     renderEngagementChart(data.posts);
 
-    // 06 Audience demographics
-    renderDemographics(data.audienceDemographics);
+    // 06 Audience demographics — now shown on Dashboard
 
     // 07 Outreach — start with 1 sample row to show the expected format
     document.getElementById('outreach-body').innerHTML = '';
