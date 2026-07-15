@@ -232,7 +232,7 @@
     </div>
 
     <div class="subsection-label">Audience Demographics</div>
-    <div class="dash-card">
+    <div class="dash-card" style="border-top:3px solid var(--purple);">
       <div id="demographics-content">
         <div class="table-scroll">
           <table class="data-table">
@@ -323,8 +323,8 @@
         </div>
         <div class="chart-box"><canvas id="follower-chart"></canvas></div>
 
-        <!-- 04 -->
-        <div class="section-title" id="post-performance-section">04 — Post Performance 📊</div>
+        <!-- 03 -->
+        <div class="section-title" id="post-performance-section">03 — Post Performance 📊</div>
         <div class="table-scroll">
         <table class="data-table">
           <thead><tr><th>Date</th><th>Type</th><th>Reach</th><th>Likes</th><th>Comments</th><th>Saves</th><th>Shares</th><th>Notes</th></tr></thead>
@@ -333,8 +333,8 @@
         </div>
         <div class="chart-box"><canvas id="post-chart"></canvas></div>
 
-        <!-- 05 -->
-        <div class="section-title" id="engagement-rate-section">05 — Engagement Rate 📈</div>
+        <!-- 04 -->
+        <div class="section-title" id="engagement-rate-section">04 — Engagement Rate 📈</div>
         <div class="section-hint">Formula: (Likes + Comments + Saves + Shares) ÷ Reach × 100</div>
         <div class="table-scroll">
         <table class="data-table">
@@ -345,8 +345,8 @@
         <div class="stat-strip" id="engagement-stats"></div>
         <div class="chart-box"><canvas id="engagement-chart"></canvas></div>
 
-        <!-- 07 -->
-        <div class="section-title">07 — Outreach &amp; Engagement 💬</div>
+        <!-- 05 -->
+        <div class="section-title">05 — Outreach &amp; Engagement 💬</div>
         <div class="table-scroll">
         <table class="data-table">
           <thead><tr><th style="width:40%;">Activity</th><th>Details / count this week</th><th style="width:36px;"></th></tr></thead>
@@ -355,8 +355,8 @@
         </div>
         <button class="add-row-btn" onclick="addOutreachRow()">+ Add row</button>
 
-        <!-- 08 -->
-        <div class="section-title">08 — Monthly Goal Progress 🎯</div>
+        <!-- 06 -->
+        <div class="section-title">06 — Monthly Goal Progress 🎯</div>
         <div class="section-hint">Any 3 criteria met = success for the month.</div>
         <div class="table-scroll">
         <table class="data-table">
@@ -749,7 +749,7 @@
     `;
     renderEngagementChart(data.posts);
 
-    // 06 Audience demographics — now shown on Dashboard
+    // Audience demographics — now shown on Dashboard
 
     // 07 Outreach — start with 1 sample row to show the expected format
     document.getElementById('outreach-body').innerHTML = '';
@@ -877,6 +877,8 @@
     renderDemoTable('demo-country-body', d.country, null, 8);
   }
 
+  const DEMO_PALETTE = ['#8B2A7A', '#F5A623', '#2F9E5C', '#3E7CB1', '#B3261E', '#7A4FB5', '#C9762E', '#4C9A9A'];
+
   function renderDemoTable(tbodyId, rows, labelMap, limit){
     const tbody = document.getElementById(tbodyId);
     if(!Array.isArray(rows) || rows.length === 0){
@@ -885,14 +887,16 @@
     }
     const total = rows.reduce((s, r) => s + r.value, 0) || 1;
     const shown = limit ? rows.slice(0, limit) : rows;
-    tbody.innerHTML = shown.map(r => {
+    tbody.innerHTML = shown.map((r, i) => {
       const pct = (r.value / total * 100);
       const label = (labelMap && labelMap[r.label]) || r.label;
+      const color = DEMO_PALETTE[i % DEMO_PALETTE.length];
       return `
         <tr>
-          <td>${escapeHtml(label)}</td>
+          <td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${color};margin-right:7px;vertical-align:middle;"></span>${escapeHtml(label)}</td>
           <td class="num" style="position:relative;">
-            <div style="position:absolute;left:0;top:0;bottom:0;background:rgba(139,42,122,.12);width:${pct.toFixed(1)}%;border-radius:3px;z-index:0;"></div>
+            <div style="position:absolute;left:0;top:0;bottom:0;background:${color};opacity:.18;width:${pct.toFixed(1)}%;border-radius:3px;z-index:0;"></div>
+            <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${color};border-radius:3px 0 0 3px;z-index:0;"></div>
             <span style="position:relative;z-index:1;">${fmtNum(r.value)} (${pct.toFixed(1)}%)</span>
           </td>
         </tr>
