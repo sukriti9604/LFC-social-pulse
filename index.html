@@ -836,6 +836,7 @@
   }
 
   const DEMO_PALETTE = ['#EBDCE7', '#FBEBCB'];
+  const DEMO_TRACK = ['#F6EFF4', '#FDF6E7'];
 
   function renderDemoTable(tbodyId, rows, labelMap, limit){
     const tbody = document.getElementById(tbodyId);
@@ -849,12 +850,13 @@
       const pct = (r.value / total * 100);
       const label = (labelMap && labelMap[r.label]) || r.label;
       const color = DEMO_PALETTE[i % DEMO_PALETTE.length];
+      const track = DEMO_TRACK[i % DEMO_TRACK.length];
       const barWidth = Math.max(pct, 14); // keep short bars readable
       return `
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${color};margin-right:7px;vertical-align:middle;"></span>${escapeHtml(label)}</td>
           <td class="num" style="position:relative;padding:6px 8px;">
-            <div style="position:relative;height:26px;width:100%;background:#F1EAEF;border-radius:5px;overflow:hidden;">
+            <div style="position:relative;height:26px;width:100%;background:${track};border-radius:5px;overflow:hidden;">
               <div style="position:absolute;left:0;top:0;bottom:0;background:${color};width:${barWidth.toFixed(1)}%;border-radius:5px;display:flex;align-items:center;padding-left:8px;">
                 <span style="color:var(--purple-dark);font-size:13px;font-weight:700;white-space:nowrap;">${fmtNum(r.value)} (${pct.toFixed(1)}%)</span>
               </div>
