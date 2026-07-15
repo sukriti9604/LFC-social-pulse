@@ -107,21 +107,12 @@
   .r-footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--paper-line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-style:italic;}
 
   /* ---- Tabs ---- */
-  .tab-nav{display:flex;gap:0;align-items:stretch;margin-left:28px;}
-  .tab-btn{padding:0 18px;border-radius:0;border:none;border-bottom:3px solid transparent;background:transparent;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;margin-bottom:-1px;}
-  .tab-btn.active{color:var(--purple-dark);border-bottom-color:var(--purple);}
-  .tab-btn:hover:not(.active){color:var(--purple-dark);background:var(--lavender);}
-  .tab-btn.subsection{font-size:12.5px;color:var(--muted);}
-  .tab-btn.subsection:hover{color:var(--purple-dark);background:var(--lavender);}
-  .tab-btn.subsection.active{color:var(--purple-dark);border-bottom-color:var(--orange);}
-  .tab-btn.hidden{display:none;}
-  .tab-divider{width:1px;background:var(--paper-line);margin:12px 8px;display:block;}
-  .tab-divider.hidden{display:none;}
+  .tab-nav{display:flex;gap:4px;align-items:center;margin-left:28px;background:var(--lavender);border:1px solid var(--paper-line);border-radius:100px;padding:4px;}
+  .tab-btn{padding:8px 20px;border-radius:100px;border:none;background:transparent;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;}
+  .tab-btn:hover:not(.active){color:var(--purple-dark);background:rgba(139,42,122,.06);}
+  .tab-btn.active{background:linear-gradient(135deg,var(--purple),var(--orange));color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(139,42,122,.25);}
   .view{display:none;}
   .view.active{display:block;}
-  @media (max-width:1024px){
-    .tab-btn.subsection{padding:0 12px;font-size:12px;}
-  }
 
   /* ---- Dashboard ---- */
   #dashboard-main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;}
@@ -192,9 +183,6 @@
       <button class="tab-btn active" id="tab-btn-dashboard" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" id="tab-btn-weekly" onclick="switchTab('weekly')">Weekly Report</button>
       <button class="tab-btn" id="tab-btn-monitoring" onclick="switchTab('monitoring')">Monitoring</button>
-      <span class="tab-divider" id="tab-divider"></span>
-      <button class="tab-btn subsection hidden" id="tab-btn-post-performance" onclick="scrollToSection('post-performance-section')">Post Performance</button>
-      <button class="tab-btn subsection hidden" id="tab-btn-engagement-rate" onclick="scrollToSection('engagement-rate-section')">Engagement Rate</button>
     </div>
   </div>
 </header>
@@ -430,38 +418,8 @@
     document.getElementById('tab-btn-weekly').classList.toggle('active', tab === 'weekly');
     document.getElementById('tab-btn-monitoring').classList.toggle('active', tab === 'monitoring');
 
-    const showSubtabs = tab === 'weekly';
-    document.getElementById('tab-divider').classList.toggle('hidden', !showSubtabs);
-    ['post-performance','engagement-rate'].forEach(id => {
-      document.getElementById('tab-btn-' + id).classList.toggle('hidden', !showSubtabs);
-    });
-    if(!showSubtabs) clearSubsectionActive();
-
     if(tab === 'dashboard') loadDashboard();
     if(tab === 'monitoring') loadKeywords();
-  }
-
-  function clearSubsectionActive(){
-    document.querySelectorAll('.tab-btn.subsection').forEach(b => b.classList.remove('active'));
-  }
-
-  function scrollToSection(id){
-    const isWeeklySection = (id === 'post-performance-section' || id === 'engagement-rate-section');
-    if(isWeeklySection && !document.getElementById('weekly-view').classList.contains('active')) switchTab('weekly');
-    else if(!isWeeklySection && !document.getElementById('dashboard-view').classList.contains('active')) switchTab('dashboard');
-    const el = document.getElementById(id);
-    if(!el) return;
-    const headerOffset = window.innerWidth <= 700 ? 114 : 78;
-    const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffset;
-    window.scrollTo({ top: y, behavior: 'smooth' });
-
-    clearSubsectionActive();
-    const map = {
-      'post-performance-section':'tab-btn-post-performance',
-      'engagement-rate-section':'tab-btn-engagement-rate'
-    };
-    const btn = document.getElementById(map[id]);
-    if(btn) btn.classList.add('active');
   }
 
   let dashCharts = {};
@@ -679,7 +637,7 @@
       reportData = data;
       renderReport(data, since, until);
       document.getElementById('download-btn').disabled = false;
-      setStatus('Data pulled. Fill in sections 01, 07, 08 below, then download.');
+      setStatus('Data pulled. Fill in sections 01, 05, 06 below, then download.');
     }catch(err){
       setStatus(`Couldn't fetch data: ${escapeHtml(err.message)}`, true);
     }finally{
@@ -891,13 +849,16 @@
       const pct = (r.value / total * 100);
       const label = (labelMap && labelMap[r.label]) || r.label;
       const color = DEMO_PALETTE[i % DEMO_PALETTE.length];
+      const barWidth = Math.max(pct, 14); // keep short bars readable
       return `
         <tr>
           <td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${color};margin-right:7px;vertical-align:middle;"></span>${escapeHtml(label)}</td>
-          <td class="num" style="position:relative;">
-            <div style="position:absolute;left:0;top:0;bottom:0;background:${color};opacity:.18;width:${pct.toFixed(1)}%;border-radius:3px;z-index:0;"></div>
-            <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${color};border-radius:3px 0 0 3px;z-index:0;"></div>
-            <span style="position:relative;z-index:1;">${fmtNum(r.value)} (${pct.toFixed(1)}%)</span>
+          <td class="num" style="position:relative;padding:6px 8px;">
+            <div style="position:relative;height:26px;width:100%;background:#F1EAEF;border-radius:5px;overflow:hidden;">
+              <div style="position:absolute;left:0;top:0;bottom:0;background:${color};width:${barWidth.toFixed(1)}%;border-radius:5px;display:flex;align-items:center;padding-left:8px;">
+                <span style="color:#fff;font-size:13px;font-weight:600;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15);">${fmtNum(r.value)} (${pct.toFixed(1)}%)</span>
+              </div>
+            </div>
           </td>
         </tr>
       `;
