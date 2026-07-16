@@ -15,56 +15,59 @@
     --ink:#2B1830; --paper:#FBF8F3; --paper-line:#E7DCE4;
     --lavender:#F5EEF3; --muted:#7A6B77; --good:#2F9E5C; --bad:#B3261E;
   }
-  *{box-sizing:border-box;}
-  html{-webkit-text-size-adjust:100%;overflow-x:hidden;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;overflow-x:hidden;scroll-behavior:smooth;}
   body{margin:0;font-family:'Source Sans 3',sans-serif;font-size:14px;color:var(--ink);background:linear-gradient(180deg,var(--lavender) 0%, #fff 380px);min-height:100vh;overflow-x:hidden;width:100%;padding-top:68px;}
-  header{height:68px;padding:0 24px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;gap:0;position:fixed;top:0;left:0;right:0;z-index:100;}
-  .brand{display:flex;align-items:center;gap:12px;padding:10px 0;border-right:1px solid var(--paper-line);margin-right:8px;padding-right:24px;}
+  a{color:var(--purple-dark);}
+  button{font-family:inherit;}
+  button:focus-visible,input:focus-visible,[contenteditable]:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:2px;}
+
+  header{height:68px;padding:0 24px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;gap:0;position:fixed;top:0;left:0;right:0;z-index:100;padding-top:env(safe-area-inset-top);}
+  .brand{display:flex;align-items:center;gap:12px;padding:10px 0;border-right:1px solid var(--paper-line);margin-right:8px;padding-right:24px;min-width:0;}
   .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:700;color:#fff;font-size:15px;flex-shrink:0;}
-  .brand h1{font-family:'Lora',serif;font-size:17px;font-weight:600;margin:0;color:var(--purple-dark);line-height:1.2;}
-  .brand p{margin:0;font-size:12px;color:var(--muted);}
+  .brand h1{font-family:'Lora',serif;font-size:17px;font-weight:600;margin:0;color:var(--purple-dark);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .brand p{margin:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;display:grid;grid-template-columns:300px 1fr;gap:20px;width:100%;}
   main, main > *{min-width:0;}
   @media (max-width:880px){
     main{grid-template-columns:1fr;padding:8px 14px 50px;gap:16px;}
-    header{padding:0 16px;}
+    header{padding:0 16px;padding-top:env(safe-area-inset-top);}
   }
   @media (max-width:700px){
-    body{padding-top:104px;}
-    header{height:auto;flex-wrap:wrap;padding:10px 16px;}
-    header > div{flex-wrap:wrap;gap:10px;}
-    .brand{border-right:none;padding-right:0;margin-right:0;}
+    body{padding-top:108px;}
+    header{height:auto;flex-wrap:wrap;padding:10px 16px calc(10px + env(safe-area-inset-top));}
+    .brand{border-right:none;margin-right:0;padding-right:0;flex:1;}
+    .brand p{display:none;}
   }
   @media (max-width:640px){
-    .tab-nav{margin-left:0;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;}
-    .tab-btn{white-space:nowrap;flex-shrink:0;}
-  }
-  @media (max-width:480px){
-    body{font-size:13px;}
-    .brand h1{font-size:15px;}
-    .brand p{font-size:11px;}
-    .r-meta input{width:120px;}
-    .stat-box .v,.dash-stat .v{font-size:16px;}
+    .tab-nav{margin-left:0;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;scrollbar-width:none;}
+    .tab-nav::-webkit-scrollbar{display:none;}
+    .tab-btn{white-space:nowrap;flex-shrink:0;padding:9px 16px;}
   }
   @media (max-width:1024px) and (min-width:881px){
     main{grid-template-columns:260px 1fr;}
+  }
+  @media (max-width:400px){
+    .brand-mark{width:30px;height:30px;font-size:13px;}
+    .brand h1{font-size:15px;}
   }
 
   .panel{background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:18px;}
   .panel h2{font-family:'Lora',serif;font-size:16px;font-weight:600;margin:0 0 14px;color:var(--purple-dark);text-transform:uppercase;letter-spacing:.05em;}
   label{font-size:14px;font-weight:600;color:var(--muted);display:block;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.03em;}
   label:first-of-type{margin-top:0;}
-  input[type=date],input[type=text]{width:100%;padding:11px 10px;border-radius:8px;border:1.5px solid var(--paper-line);font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);}
+  input[type=date],input[type=text]{width:100%;padding:12px 10px;border-radius:8px;border:1.5px solid var(--paper-line);font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--ink);background:#fff;min-height:44px;}
+  input[type=date]:focus,input[type=text]:focus{border-color:var(--purple);}
   .range-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
   .range-row input{min-width:0;flex:1 1 130px;}
   .range-row span{color:var(--muted);font-size:14px;}
   .presets{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
-  .preset-chip{padding:7px 12px;border-radius:100px;border:1px solid var(--paper-line);background:var(--lavender);font-size:14px;font-weight:600;color:var(--purple-dark);cursor:pointer;}
-  .generate-btn{width:100%;margin-top:18px;padding:14px;border:none;border-radius:10px;background:var(--purple);color:#fff;font-family:'Lora',serif;font-weight:600;font-size:16px;cursor:pointer;}
+  .preset-chip{padding:8px 14px;border-radius:100px;border:1px solid var(--paper-line);background:var(--lavender);font-size:14px;font-weight:600;color:var(--purple-dark);cursor:pointer;min-height:38px;display:inline-flex;align-items:center;}
+  .generate-btn{width:100%;margin-top:18px;padding:14px;border:none;border-radius:10px;background:var(--purple);color:#fff;font-family:'Lora',serif;font-weight:600;font-size:16px;cursor:pointer;min-height:48px;}
   .generate-btn:hover{background:var(--purple-dark);}
   .generate-btn:disabled{background:#C9B9C5;cursor:wait;}
-  .download-btn{width:100%;margin-top:10px;padding:14px;border:none;border-radius:10px;background:var(--orange);color:#4A2E00;font-family:'Lora',serif;font-weight:600;font-size:16px;cursor:pointer;}
+  .download-btn{width:100%;margin-top:10px;padding:14px;border:none;border-radius:10px;background:var(--orange);color:#4A2E00;font-family:'Lora',serif;font-weight:600;font-size:16px;cursor:pointer;min-height:48px;}
   .download-btn:disabled{opacity:.4;cursor:not-allowed;}
   .status{font-size:14px;color:var(--muted);margin-top:10px;min-height:16px;line-height:1.5;}
   .status.err{color:var(--bad);}
@@ -72,69 +75,85 @@
   .hint{font-size:14px;color:var(--muted);margin-top:16px;line-height:1.5;padding-top:12px;border-top:1px solid var(--paper-line);}
 
   #report-wrap{display:flex;justify-content:center;width:100%;min-width:0;}
-  #report{width:740px;max-width:100%;min-width:0;background:var(--paper);border:1px solid var(--paper-line);box-shadow:0 12px 32px rgba(139,42,122,.08);padding:40px 42px;font-family:'Source Sans 3',sans-serif;}
+  #report{width:740px;max-width:100%;min-width:0;background:var(--paper);border:1px solid var(--paper-line);box-shadow:0 12px 32px rgba(139,42,122,.08);padding:40px 42px;font-family:'Source Sans 3',sans-serif;border-radius:8px;}
   @media (max-width:600px){
-    #report{padding:18px 14px;}
+    #report{padding:20px 16px;border-radius:10px;}
   }
-  .empty-state{padding:50px 16px;text-align:center;color:var(--muted);font-size:14px;}
+  .empty-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px;line-height:1.6;}
   .empty-state b{color:var(--purple-dark);}
 
   .lfc-name{font-family:'Lora',serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:var(--purple-dark);text-align:center;}
   .r-title{font-family:'Lora',serif;font-size:22px;font-weight:600;color:var(--purple-dark);margin:4px 0 18px;line-height:1.25;text-align:center;}
+  @media (max-width:480px){ .r-title{font-size:19px;} }
   .r-meta{font-size:14px;color:var(--muted);margin-bottom:6px;}
-  .r-meta input{border:none;border-bottom:1px dashed var(--paper-line);background:transparent;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);width:160px;}
+  .r-meta input{border:none;border-bottom:1px dashed var(--paper-line);background:transparent;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);width:160px;max-width:100%;}
   .r-divider{height:2px;background:linear-gradient(90deg,var(--purple),var(--orange));margin:16px 0 20px;border-radius:2px;}
 
   .section-title{font-family:'Lora',serif;font-size:16px;font-weight:600;color:var(--purple-dark);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.03em;padding-bottom:6px;border-bottom:2px solid var(--paper-line);}
+  @media (max-width:480px){ .section-title{font-size:14px;} }
   .section-hint{font-size:14px;color:var(--muted);font-style:italic;margin:-6px 0 10px;}
 
-  [contenteditable]{outline:none;border-bottom:1px dashed var(--paper-line);min-height:1.6em;padding:4px 1px;font-size:14px;}
+  [contenteditable]{outline:none;border-bottom:1px dashed var(--paper-line);min-height:2em;padding:6px 2px;font-size:15px;line-height:1.5;border-radius:3px;}
   [contenteditable]:empty:before{content:attr(data-placeholder);color:#B8AAB4;}
   [contenteditable]:focus{border-bottom:1px solid var(--purple);background:#fff;}
+  [contenteditable]:hover{background:rgba(139,42,122,.03);}
 
-  .table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;}
+  .table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;position:relative;}
   table.data-table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px;margin-bottom:0;}
-  table.data-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:8px;border-bottom:1.5px solid var(--paper-line);white-space:nowrap;}
-  table.data-table td{padding:8px;border-bottom:1px solid var(--paper-line);vertical-align:top;}
+  table.data-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:9px 8px;border-bottom:1.5px solid var(--paper-line);white-space:nowrap;}
+  table.data-table td{padding:9px 8px;border-bottom:1px solid var(--paper-line);vertical-align:top;}
   table.data-table tr:last-child td{border-bottom:none;}
+  table.data-table tbody tr:hover{background:rgba(139,42,122,.025);}
   .num{font-family:'IBM Plex Mono',monospace;font-weight:600;}
+  @media (max-width:600px){
+    table.data-table th,table.data-table td{padding:8px 7px;font-size:13px;}
+  }
 
-  .goal-status{font-size:14px;padding:6px 8px;border-radius:6px;border:1px solid var(--paper-line);background:#fff;font-family:'Source Sans 3';}
+  .goal-status{font-size:14px;padding:8px;border-radius:6px;border:1px solid var(--paper-line);background:#fff;font-family:'Source Sans 3';min-height:38px;}
 
-  .add-row-btn{font-size:14px;font-weight:600;color:var(--purple-dark);background:var(--lavender);border:1px solid var(--paper-line);border-radius:7px;padding:7px 12px;cursor:pointer;margin-top:6px;margin-right:6px;}
-  .del-row-btn{font-size:13px;font-weight:600;color:var(--bad);background:#fff;border:1px solid var(--paper-line);border-radius:6px;padding:3px 8px;cursor:pointer;line-height:1;}
+  .add-row-btn{font-size:14px;font-weight:600;color:var(--purple-dark);background:var(--lavender);border:1px solid var(--paper-line);border-radius:7px;padding:9px 14px;cursor:pointer;margin-top:6px;margin-right:6px;min-height:38px;}
+  .del-row-btn{font-size:13px;font-weight:600;color:var(--bad);background:#fff;border:1px solid var(--paper-line);border-radius:6px;padding:6px 10px;cursor:pointer;line-height:1;min-height:32px;min-width:32px;}
 
   .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px;}
   .stat-strip.cols-2{grid-template-columns:repeat(2,1fr);}
-  @media (max-width:420px){ .stat-strip{grid-template-columns:1fr;} }
+  @media (max-width:480px){ .stat-strip{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:340px){ .stat-strip{grid-template-columns:1fr;} }
   .stat-box{background:#fff;border:1px solid var(--paper-line);border-radius:9px;padding:12px 10px;text-align:center;}
   .stat-box .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;color:var(--purple-dark);}
   .stat-box .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:3px;}
 
   .chart-box{background:#fff;border:1px solid var(--paper-line);border-radius:10px;padding:14px;margin:10px 0 16px;height:220px;position:relative;}
+  @media (max-width:480px){ .chart-box{height:190px;padding:10px;} }
 
   .r-footer{margin-top:24px;padding-top:12px;border-top:1px solid var(--paper-line);font-size:13px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-style:italic;}
 
   /* ---- Tabs ---- */
   .tab-nav{display:flex;gap:4px;align-items:center;margin-left:28px;background:#fff;border:1px solid var(--paper-line);border-radius:100px;padding:4px;}
-  .tab-btn{padding:8px 20px;border-radius:100px;border:none;background:transparent;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;}
+  .tab-btn{padding:8px 20px;border-radius:100px;border:none;background:transparent;font-family:'Source Sans 3',sans-serif;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;min-height:38px;}
   .tab-btn:hover:not(.active){color:var(--purple-dark);background:rgba(139,42,122,.06);}
   .tab-btn.active{background:linear-gradient(135deg,var(--purple),var(--orange));color:#fff;font-weight:700;box-shadow:0 3px 10px rgba(139,42,122,.25);}
   .view{display:none;}
   .view.active{display:block;}
+  @media (max-width:700px){
+    .tab-nav{margin-top:8px;}
+    .tab-btn{padding:8px 18px;font-size:13px;}
+  }
 
   /* ---- Dashboard ---- */
   #dashboard-main{max-width:1180px;margin:0 auto;padding:8px 20px 60px;}
-  @media (max-width:880px){ #dashboard-main{padding:8px 14px 50px;} }
+  @media (max-width:880px){ #dashboard-main{padding:8px 14px 50px;} #monitoring-main{padding:8px 14px 50px !important;} }
   .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  @media (max-width:880px){ .dash-grid{grid-template-columns:1fr;} }
+  @media (max-width:880px){ .dash-grid{grid-template-columns:1fr;gap:14px;} }
   .dash-card{background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:18px;}
+  @media (max-width:480px){ .dash-card{padding:14px;border-radius:12px;} }
   .dash-card h3{font-family:'Lora',serif;font-size:16px;color:var(--purple-dark);margin:0 0 12px;}
   .dash-chart-box{height:240px;position:relative;}
+  @media (max-width:480px){ .dash-chart-box{height:200px;} }
   .dash-summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px;}
   @media (max-width:900px){ .dash-summary{grid-template-columns:repeat(3,1fr);} }
-  @media (max-width:700px){ .dash-summary{grid-template-columns:1fr 1fr;} }
+  @media (max-width:700px){ .dash-summary{grid-template-columns:1fr 1fr;gap:10px;} }
   .dash-stat{background:#fff;border:1px solid var(--paper-line);border-radius:12px;padding:16px;text-align:center;}
+  @media (max-width:700px){ .dash-stat{padding:12px 10px;} }
   .dash-stat .v{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;color:var(--purple-dark);}
   .dash-stat .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:4px;}
   .dash-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px;}
@@ -162,13 +181,24 @@
   .section-header{max-width:1180px;margin:0 auto;padding:20px 20px 0;}
   @media (max-width:880px){ .section-header{padding:16px 14px 0;} }
   .section-header h2{font-family:'Lora',serif;font-size:20px;font-weight:600;color:var(--purple-dark);margin:0 0 4px;}
-  .section-header p{font-size:14px;color:var(--muted);margin:0 0 14px;}
+  @media (max-width:480px){ .section-header h2{font-size:18px;} }
+  .section-header p{font-size:14px;color:var(--muted);margin:0 0 14px;line-height:1.5;}
 
   .subsection-label{font-family:'Lora',serif;font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 10px;}
   .subsection-label:first-child{margin-top:0;}
 
   .draft-note{font-size:12px;color:var(--purple-dark);background:var(--lavender);border-radius:6px;padding:4px 9px;display:inline-block;margin-bottom:10px;}
 
+  /* ---- Monitoring feed items ---- */
+  .feed-item{border-bottom:1px solid var(--paper-line);padding:10px 0;}
+  .feed-item:last-child{border-bottom:none;}
+  .feed-item.flagged{background:#FFF6E8;border-left:3px solid var(--orange);padding-left:8px;margin-left:-11px;}
+  .feed-item-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+  .feed-user{font-weight:600;color:var(--purple-dark);font-size:14px;}
+  .feed-time{font-size:12px;color:var(--muted);white-space:nowrap;}
+  .feed-text{font-size:14px;margin-top:3px;line-height:1.5;word-break:break-word;}
+  .feed-context{font-size:12px;color:var(--muted);margin-top:3px;font-style:italic;}
+  .feed-flag-badge{background:var(--orange);color:#4A2E00;font-size:11px;font-weight:600;padding:1px 6px;border-radius:5px;margin-left:6px;white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -182,6 +212,7 @@
     <div class="tab-nav">
       <button class="tab-btn active" id="tab-btn-dashboard" onclick="switchTab('dashboard')">Dashboard</button>
       <button class="tab-btn" id="tab-btn-weekly" onclick="switchTab('weekly')">Weekly Report</button>
+      <button class="tab-btn" id="tab-btn-monitoring" onclick="switchTab('monitoring')">Monitoring</button>
     </div>
   </div>
 </header>
@@ -368,6 +399,42 @@
 </div>
 <!-- end weekly-view -->
 
+<!-- ============ MONITORING VIEW ============ -->
+<div id="monitoring-view" class="view">
+  <div class="section-header">
+    <h2>Monitoring</h2>
+    <p>Recent comments and DMs in one place — read-only, with keyword flags you control.</p>
+  </div>
+  <main id="monitoring-main" style="max-width:1180px;margin:0 auto;padding:8px 20px 60px;">
+    <div class="subsection-label">Settings</div>
+    <div class="dash-card">
+      <h3>Flagged Keywords</h3>
+      <p style="font-size:14px;color:var(--muted);margin:0 0 10px;line-height:1.5;">Comma-separated. Any comment or DM containing one of these gets flagged 🚩 below.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" id="keywords-input" placeholder="e.g. collab, partnership, letters for change" style="flex:1;min-width:220px;padding:11px 10px;border-radius:8px;border:1.5px solid var(--paper-line);font-size:16px;min-height:44px;" />
+        <button class="add-row-btn" style="min-width:120px;" onclick="saveKeywords()">Save keywords</button>
+      </div>
+      <div id="keywords-status" style="font-size:13px;color:var(--muted);margin-top:8px;"></div>
+    </div>
+
+    <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span>Live Feed</span>
+      <button class="generate-btn" style="width:auto;padding:10px 16px;margin:0;font-size:14px;min-height:40px;" onclick="loadMonitoring()">Refresh comments &amp; DMs</button>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-card">
+        <h3>Recent Comments</h3>
+        <div id="comments-list"><div class="dash-empty"><span class="big-icon">💬</span>Click Refresh to load recent comments.</div></div>
+      </div>
+      <div class="dash-card">
+        <h3>Recent DMs</h3>
+        <div id="messages-list"><div class="dash-empty"><span class="big-icon">✉️</span>Click Refresh to load recent DMs.</div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
 <script>
   const WORKER_URL = "https://lfc-social.sukriti7936.workers.dev";
   const teamKey = ''; // passcode system disabled for now — Worker ignores this unless a TEAM_KEY secret is set later
@@ -376,10 +443,13 @@
   function switchTab(tab){
     document.getElementById('dashboard-view').classList.toggle('active', tab === 'dashboard');
     document.getElementById('weekly-view').classList.toggle('active', tab === 'weekly');
+    document.getElementById('monitoring-view').classList.toggle('active', tab === 'monitoring');
     document.getElementById('tab-btn-dashboard').classList.toggle('active', tab === 'dashboard');
     document.getElementById('tab-btn-weekly').classList.toggle('active', tab === 'weekly');
+    document.getElementById('tab-btn-monitoring').classList.toggle('active', tab === 'monitoring');
 
     if(tab === 'dashboard') loadDashboard();
+    if(tab === 'monitoring') loadKeywords();
   }
 
   let dashCharts = {};
@@ -461,6 +531,96 @@
     setPreset(7);
   }
 
+  /* ---------- Monitoring (comments + DMs, keyword flagging) ---------- */
+
+  async function loadKeywords(){
+    try{
+      const res = await fetch(`${WORKER_URL}/monitor/keywords?key=${encodeURIComponent(teamKey)}`);
+      const data = await res.json();
+      document.getElementById('keywords-input').value = (data.keywords || []).join(', ');
+    }catch(_){ /* leave input blank, non-critical */ }
+  }
+
+  async function saveKeywords(){
+    const raw = document.getElementById('keywords-input').value;
+    const keywords = raw.split(',').map(k => k.trim()).filter(Boolean);
+    const statusEl = document.getElementById('keywords-status');
+    statusEl.textContent = 'Saving…';
+    try{
+      const res = await fetch(`${WORKER_URL}/monitor/keywords?key=${encodeURIComponent(teamKey)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ keywords })
+      });
+      const data = await res.json();
+      statusEl.textContent = `Saved ✓ (${(data.keywords||[]).length} keyword${(data.keywords||[]).length===1?'':'s'})`;
+    }catch(err){
+      statusEl.textContent = `Couldn't save: ${escapeHtml(err.message)}`;
+    }
+  }
+
+  async function loadMonitoring(){
+    const commentsEl = document.getElementById('comments-list');
+    const messagesEl = document.getElementById('messages-list');
+    commentsEl.innerHTML = `<div class="loading-row"><span class="spinner"></span>Loading comments…</div>`;
+    messagesEl.innerHTML = `<div class="loading-row"><span class="spinner"></span>Loading DMs…</div>`;
+
+    try{
+      const res = await fetch(`${WORKER_URL}/comments?key=${encodeURIComponent(teamKey)}`);
+      const data = await res.json();
+      if(data.error){
+        commentsEl.innerHTML = `<div class="dash-empty">${escapeHtml(data.error)}${data.reconnect ? ` <a href="${WORKER_URL}${data.reconnect}" target="_blank">Reconnect →</a>`:''}</div>`;
+      } else if(!data.comments || data.comments.length === 0){
+        commentsEl.innerHTML = `<div class="dash-empty"><span class="big-icon">💬</span>No recent comments found.</div>`;
+      } else {
+        commentsEl.innerHTML = data.comments.map(c => `
+          <div class="feed-item${c.flagged ? ' flagged' : ''}">
+            <div class="feed-item-head">
+              <span><span class="feed-user">${escapeHtml(c.username)}</span>${c.flagged ? '<span class="feed-flag-badge">FLAGGED</span>' : ''}</span>
+              <span class="feed-time">${fmtRelative(c.timestamp)}</span>
+            </div>
+            <div class="feed-text">${escapeHtml(c.text)}</div>
+            <div class="feed-context">on: ${escapeHtml(c.postCaption || 'post')}</div>
+          </div>
+        `).join('');
+      }
+    }catch(err){
+      commentsEl.innerHTML = `<div class="dash-empty">Couldn't load comments: ${escapeHtml(err.message)}</div>`;
+    }
+
+    try{
+      const res = await fetch(`${WORKER_URL}/messages?key=${encodeURIComponent(teamKey)}`);
+      const data = await res.json();
+      if(data.error){
+        messagesEl.innerHTML = `<div class="dash-empty">${escapeHtml(data.error)}${data.reconnect ? ` <a href="${WORKER_URL}${data.reconnect}" target="_blank">Reconnect →</a>`:''}</div>`;
+      } else if(data.messagingUnavailable){
+        messagesEl.innerHTML = `<div class="dash-empty">DM access isn't available yet — this usually means Meta needs one more approval step for messaging permissions (separate from comments/insights). Comments monitoring still works normally.</div>`;
+      } else if(!data.messages || data.messages.length === 0){
+        messagesEl.innerHTML = `<div class="dash-empty"><span class="big-icon">✉️</span>No recent DMs found.</div>`;
+      } else {
+        messagesEl.innerHTML = data.messages.map(m => `
+          <div class="feed-item${m.flagged ? ' flagged' : ''}">
+            <div class="feed-item-head">
+              <span><span class="feed-user">${escapeHtml(m.from)}</span>${m.flagged ? '<span class="feed-flag-badge">FLAGGED</span>' : ''}</span>
+              <span class="feed-time">${fmtRelative(m.timestamp)}</span>
+            </div>
+            <div class="feed-text">${escapeHtml(m.text)}</div>
+          </div>
+        `).join('');
+      }
+    }catch(err){
+      messagesEl.innerHTML = `<div class="dash-empty">Couldn't load DMs: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  function fmtRelative(iso){
+    if(!iso) return '—';
+    const d = new Date(iso);
+    const diffH = (Date.now() - d.getTime()) / 3600000;
+    if(diffH < 24) return `${Math.max(1,Math.round(diffH))}h ago`;
+    if(diffH < 24*7) return `${Math.round(diffH/24)}d ago`;
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+  }
   const GOAL_TEMPLATE = [
     "One non-profit follows LFC",
     "One influencer (10k+) follows LFC",
