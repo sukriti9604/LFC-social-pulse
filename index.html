@@ -23,6 +23,7 @@
   button:focus-visible,input:focus-visible,[contenteditable]:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:2px;}
 
   header{height:68px;padding:0 24px;display:flex;align-items:stretch;justify-content:space-between;border-bottom:1px solid var(--paper-line);background:#fff;gap:0;position:fixed;top:0;left:0;right:0;z-index:100;padding-top:env(safe-area-inset-top);}
+  .header-inner{display:flex;align-items:stretch;flex:1;min-width:0;}
   .brand{display:flex;align-items:center;gap:12px;padding:10px 0;border-right:1px solid var(--paper-line);margin-right:8px;padding-right:24px;min-width:0;}
   .brand-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-weight:700;color:#fff;font-size:15px;flex-shrink:0;}
   .brand h1{font-family:'Lora',serif;font-size:17px;font-weight:600;margin:0;color:var(--purple-dark);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -36,7 +37,8 @@
   }
   @media (max-width:700px){
     body{padding-top:108px;}
-    header{height:auto;flex-wrap:wrap;padding:10px 16px calc(10px + env(safe-area-inset-top));}
+    header{height:auto;padding:10px 16px calc(10px + env(safe-area-inset-top));}
+    .header-inner{flex-wrap:wrap;}
     .brand{border-right:none;margin-right:0;padding-right:0;flex:1;}
     .brand p{display:none;}
   }
@@ -135,7 +137,7 @@
   .view{display:none;}
   .view.active{display:block;}
   @media (max-width:700px){
-    .tab-nav{margin-top:8px;}
+    .tab-nav{margin-top:8px;margin-left:0;}
     .tab-btn{padding:8px 18px;font-size:13px;}
   }
 
@@ -204,7 +206,7 @@
 <body>
 
 <header>
-  <div style="display:flex;align-items:stretch;flex:1;min-width:0;">
+  <div class="header-inner">
     <div class="brand">
       <div class="brand-mark">LFC</div>
       <div><h1>Instagram Tracker</h1><p>Letters for Change · tracking &amp; weekly reporting</p></div>
