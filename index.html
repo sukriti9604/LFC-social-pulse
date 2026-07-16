@@ -114,6 +114,11 @@
   .goal-status{font-size:14px;padding:8px;border-radius:6px;border:1px solid var(--paper-line);background:#fff;font-family:'Source Sans 3';min-height:38px;}
 
   .add-row-btn{font-size:14px;font-weight:600;color:var(--purple-dark);background:var(--lavender);border:1px solid var(--paper-line);border-radius:7px;padding:9px 14px;cursor:pointer;margin-top:6px;margin-right:6px;min-height:38px;}
+  .priority-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--paper-line);}
+  .priority-row:last-child{border-bottom:none;}
+  .priority-num{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--purple-dark);flex-shrink:0;padding-top:8px;}
+  .priority-row [contenteditable]{flex:1;min-height:auto;border-bottom:none;padding:6px 2px;}
+  .priority-row .del-row-btn{flex-shrink:0;margin-top:2px;}
   .del-row-btn{font-size:13px;font-weight:600;color:var(--bad);background:#fff;border:1px solid var(--paper-line);border-radius:6px;padding:6px 10px;cursor:pointer;line-height:1;min-height:32px;min-width:32px;}
 
   .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px;}
@@ -389,6 +394,24 @@
           <b>Criteria met this month: <span id="goals-met">0</span> / 3</b><br>
           <b>Criteria in progress: <span id="goals-progress">0</span> / <span id="goals-total">7</span></b>
         </div>
+
+        <!-- 07 -->
+        <div class="section-title">07 — What Worked ✅</div>
+        <div class="section-hint">Best performing post or activity this week + why you think it did well.</div>
+        <div contenteditable="true" data-placeholder="Click to write what worked this week..." id="f-worked"></div>
+
+        <!-- 08 -->
+        <div class="section-title">08 — What Didn't Work 🔍</div>
+        <div class="section-hint">Weakest performing post or activity this week + why you think it fell short.</div>
+        <div contenteditable="true" data-placeholder="Click to write what didn't work this week..." id="f-not-worked"></div>
+
+        <!-- 09 -->
+        <div class="section-title">09 — Next Week's Priorities</div>
+        <div class="section-hint">2–3 specific tasks like follow-ups, live sessions, event highlights.</div>
+        <div id="priorities-list"></div>
+        <button class="add-row-btn" onclick="addPriorityRow()">+ Add priority</button>
+
+        <div class="section-hint" style="margin-top:22px;text-align:center;">"Tracking is what happened. Reporting is what it means."</div>
 
         <div class="r-footer">
           <span>Letters for Change · Instagram Weekly Report</span>
@@ -673,7 +696,7 @@
       reportData = data;
       renderReport(data, since, until);
       document.getElementById('download-btn').disabled = false;
-      setStatus('Data pulled. Fill in sections 01, 05, 06 below, then download.');
+      setStatus('Data pulled. Fill in sections 01, 05, 06, 07, 08, 09 below, then download.');
     }catch(err){
       setStatus(`Couldn't fetch data: ${escapeHtml(err.message)}`, true);
     }finally{
@@ -758,6 +781,11 @@
     });
     updateGoalCounts();
 
+    // 09 Next week's priorities — start with 2 blank rows
+    document.getElementById('priorities-list').innerHTML = '';
+    addPriorityRow();
+    addPriorityRow();
+
     // Restore any unsaved draft for this exact date range, if one exists
     currentDraftKey = draftKey(since, until);
     const draft = loadDraft(since, until);
@@ -800,14 +828,19 @@
       status: tr.querySelector('.goal-status')?.value || 'not_started',
       note: tr.children[2]?.textContent.trim() || '',
     }));
+    const priorities = [...document.querySelectorAll('#priorities-list .priority-row [contenteditable]')].map(el => el.textContent.trim());
     return {
       highlight: document.getElementById('f-highlight')?.textContent || '',
-      outreach, goals,
+      worked: document.getElementById('f-worked')?.textContent || '',
+      notWorked: document.getElementById('f-not-worked')?.textContent || '',
+      outreach, goals, priorities,
     };
   }
 
   function restoreDraft(draft){
     if(typeof draft.highlight === 'string') document.getElementById('f-highlight').textContent = draft.highlight;
+    if(typeof draft.worked === 'string') document.getElementById('f-worked').textContent = draft.worked;
+    if(typeof draft.notWorked === 'string') document.getElementById('f-not-worked').textContent = draft.notWorked;
 
     if(Array.isArray(draft.outreach) && draft.outreach.length){
       document.getElementById('outreach-body').innerHTML = '';
@@ -818,6 +851,10 @@
       document.getElementById('goals-body').innerHTML = '';
       draft.goals.forEach(g => addGoalRow(g.name, g.editable, g.status, g.note));
       updateGoalCounts();
+    }
+    if(Array.isArray(draft.priorities) && draft.priorities.length){
+      document.getElementById('priorities-list').innerHTML = '';
+      draft.priorities.forEach(p => addPriorityRow(p));
     }
   }
 
@@ -953,6 +990,25 @@
         <td><button class="del-row-btn" onclick="this.closest('tr').remove(); saveDraftDebounced();">✕</button></td>
       </tr>
     `);
+  }
+
+  /* ---------- Next week's priorities (numbered, addable, deletable) ---------- */
+
+  function addPriorityRow(sampleText = ''){
+    document.getElementById('priorities-list').insertAdjacentHTML('beforeend', `
+      <div class="priority-row">
+        <div class="priority-num"></div>
+        <div contenteditable="true" data-placeholder="e.g. Repurpose this week's best reel into Stories...">${escapeHtml(sampleText)}</div>
+        <button class="del-row-btn" onclick="this.closest('.priority-row').remove(); renumberPriorities(); saveDraftDebounced();">✕</button>
+      </div>
+    `);
+    renumberPriorities();
+  }
+
+  function renumberPriorities(){
+    document.querySelectorAll('#priorities-list .priority-row').forEach((row, i) => {
+      row.querySelector('.priority-num').textContent = `${i + 1}.`;
+    });
   }
 
   /* ---------- Monthly goals (default 7 shown, addable, deletable; success threshold fixed at 3) ---------- */
