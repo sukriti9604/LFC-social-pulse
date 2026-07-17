@@ -1169,6 +1169,10 @@
         const sliceData = sliceCanvas.toDataURL('image/png');
         const sliceHeightPt = sliceHeightPx * ptPerPx;
         if (!firstPage) pdf.addPage();
+        // Match the main site's light lavender background instead of leaving
+        // the page plain white, so the exported PDF doesn't look mismatched.
+        pdf.setFillColor('#F5EEF3');
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeightPt);
         firstPage = false;
 
