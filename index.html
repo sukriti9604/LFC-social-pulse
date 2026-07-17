@@ -1169,10 +1169,6 @@
         const sliceData = sliceCanvas.toDataURL('image/png');
         const sliceHeightPt = sliceHeightPx * ptPerPx;
         if (!firstPage) pdf.addPage();
-        // Fill the whole page with the same light lavender used behind the
-        // report on the main site, so the margins match instead of standing out.
-        pdf.setFillColor('#F5EEF3');
-        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeightPt);
         firstPage = false;
 
