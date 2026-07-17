@@ -1169,6 +1169,10 @@
         const sliceData = sliceCanvas.toDataURL('image/png');
         const sliceHeightPt = sliceHeightPx * ptPerPx;
         if (!firstPage) pdf.addPage();
+        // Fill the whole page purple first so the margin around the report
+        // image (and any gap on the last, shorter page) isn't plain white.
+        pdf.setFillColor('#8B2A7A');
+        pdf.rect(0, 0, pageWidth, pageHeight, 'F');
         pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeightPt);
         firstPage = false;
 
