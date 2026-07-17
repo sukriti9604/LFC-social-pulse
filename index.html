@@ -483,7 +483,7 @@
     document.getElementById('tab-btn-monitoring').classList.toggle('active', tab === 'monitoring');
 
     if(tab === 'dashboard') loadDashboard();
-    if(tab === 'monitoring') loadKeywords();
+    if(tab === 'monitoring'){ loadKeywords(); loadMonitoring(); }
   }
 
   let dashCharts = {};
