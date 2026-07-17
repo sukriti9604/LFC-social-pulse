@@ -121,6 +121,15 @@
   .priority-row .del-row-btn{flex-shrink:0;margin-top:2px;}
   .del-row-btn{font-size:13px;font-weight:600;color:var(--bad);background:#fff;border:1px solid var(--paper-line);border-radius:6px;padding:6px 10px;cursor:pointer;line-height:1;min-height:32px;min-width:32px;}
 
+  /* PDF export mode: strip editing chrome so the exported file looks like a finished report */
+  #report.pdf-export .add-row-btn,
+  #report.pdf-export .del-row-btn,
+  #report.pdf-export .del-col{display:none !important;}
+  #report.pdf-export [contenteditable]{border-bottom:none !important;background:transparent !important;padding:6px 2px;}
+  #report.pdf-export [contenteditable]:empty:before{content:'' !important;}
+  #report.pdf-export .priority-row{gap:0;}
+  #report.pdf-export select.goal-status{-webkit-appearance:none;appearance:none;border:none;background:transparent;padding:8px 0;}
+
   .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 14px;}
   .stat-strip.cols-2{grid-template-columns:repeat(2,1fr);}
   @media (max-width:480px){ .stat-strip{grid-template-columns:repeat(2,1fr);} }
@@ -374,7 +383,7 @@
         <div class="section-title">05 — Outreach &amp; Engagement 💬</div>
         <div class="table-scroll">
         <table class="data-table">
-          <thead><tr><th style="width:40%;">Activity</th><th>Details / count this week</th><th style="width:36px;"></th></tr></thead>
+          <thead><tr><th style="width:40%;">Activity</th><th>Details / count this week</th><th class="del-col" style="width:36px;"></th></tr></thead>
           <tbody id="outreach-body"></tbody>
         </table>
         </div>
@@ -385,7 +394,7 @@
         <div class="section-hint">Any 3 criteria met = success for the month.</div>
         <div class="table-scroll">
         <table class="data-table">
-          <thead><tr><th style="width:34%;">Goal</th><th style="width:18%;">Status</th><th>Notes</th><th style="width:36px;"></th></tr></thead>
+          <thead><tr><th style="width:34%;">Goal</th><th style="width:18%;">Status</th><th>Notes</th><th class="del-col" style="width:36px;"></th></tr></thead>
           <tbody id="goals-body"></tbody>
         </table>
         </div>
@@ -1028,7 +1037,7 @@
       <tr>
         <td contenteditable="true" data-placeholder="e.g. Instagram accounts that responded">${escapeHtml(sampleActivity)}</td>
         <td contenteditable="true" data-placeholder="e.g. 7 accounts replied…">${escapeHtml(sampleDetail)}</td>
-        <td><button class="del-row-btn" onclick="this.closest('tr').remove(); saveDraftDebounced();">✕</button></td>
+        <td class="del-col"><button class="del-row-btn" onclick="this.closest('tr').remove(); saveDraftDebounced();">✕</button></td>
       </tr>
     `);
   }
@@ -1068,7 +1077,7 @@
           <option value="done"${sampleStatus==='done'?' selected':''}>✅ Done</option>
         </select></td>
         <td contenteditable="true" data-placeholder="notes…">${escapeHtml(sampleNote)}</td>
-        <td><button class="del-row-btn" onclick="removeGoalRow(this)">✕</button></td>
+        <td class="del-col"><button class="del-row-btn" onclick="removeGoalRow(this)">✕</button></td>
       </tr>
     `);
     updateGoalCounts();
@@ -1095,29 +1104,75 @@
     document.getElementById('goals-total').textContent = rows.length;
   }
 
+  // Elements that must never be sliced in half by a page break
+  const PDF_ATOMIC_SELECTOR = '.section-title,.section-hint,.r-meta,.lfc-name,.r-title,.r-divider,.draft-note,tr,.chart-box,.stat-strip,.priority-row,.r-footer,[contenteditable]';
+
   async function downloadPdf(){
     const reportEl = document.getElementById('report');
     setStatus('<span class="spinner"></span>Rendering PDF…');
+
+    // Switch into export mode: hides add/delete-row buttons, contenteditable
+    // dashed borders & placeholder text so the PDF looks like a finished report
+    reportEl.classList.add('pdf-export');
+
     try{
+      // Collect safe-break info (in CSS px, relative to the report's top) before capture
+      const reportRect = reportEl.getBoundingClientRect();
+      const atomicRanges = [...reportEl.querySelectorAll(PDF_ATOMIC_SELECTOR)]
+        .map(el => el.getBoundingClientRect())
+        .filter(r => r.height > 0)
+        .map(r => ({ top: r.top - reportRect.top, bottom: r.bottom - reportRect.top }));
+
       const canvas = await html2canvas(reportEl, { scale: 2, backgroundColor: '#FBF8F3' });
-      const imgData = canvas.toDataURL('image/png');
+      const scaleFactor = canvas.width / reportRect.width; // css px -> canvas px
+
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'pt', 'a4');
+      const margin = 24;
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgWidth = pageWidth - margin * 2;
+      const ptPerPx = imgWidth / canvas.width;
+      const pageHeightPx = (pageHeight - margin * 2) / ptPerPx;
 
-      // Paginate if the report is taller than one A4 page
-      let heightLeft = imgHeight;
-      let position = 0;
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // Atomic element ranges in canvas-px space
+      const rangesPx = atomicRanges.map(r => ({ top: r.top * scaleFactor, bottom: r.bottom * scaleFactor }));
+
+      const sliceCanvas = document.createElement('canvas');
+      const sliceCtx = sliceCanvas.getContext('2d');
+
+      let sourceY = 0;
+      let firstPage = true;
+      while (sourceY < canvas.height - 1) {
+        let sourceYEnd = Math.min(sourceY + pageHeightPx, canvas.height);
+
+        if (sourceYEnd < canvas.height) {
+          // If this break point falls inside an element, pull the break back
+          // to that element's top so the whole element moves to the next page
+          let earliestTop = null;
+          for (const r of rangesPx) {
+            if (r.top < sourceYEnd && r.bottom > sourceYEnd + 0.5) {
+              if (earliestTop === null || r.top < earliestTop) earliestTop = r.top;
+            }
+          }
+          if (earliestTop !== null && earliestTop > sourceY + pageHeightPx * 0.15) {
+            sourceYEnd = earliestTop;
+          }
+        }
+
+        const sliceHeightPx = Math.max(1, Math.round(sourceYEnd - sourceY));
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sliceHeightPx;
+        sliceCtx.clearRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        sliceCtx.drawImage(canvas, 0, sourceY, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+
+        const sliceData = sliceCanvas.toDataURL('image/png');
+        const sliceHeightPt = sliceHeightPx * ptPerPx;
+        if (!firstPage) pdf.addPage();
+        pdf.addImage(sliceData, 'PNG', margin, margin, imgWidth, sliceHeightPt);
+        firstPage = false;
+
+        sourceY = sourceYEnd;
       }
 
       const since = document.getElementById('since-input').value;
@@ -1126,6 +1181,8 @@
       setStatus('Downloaded ✓');
     }catch(err){
       setStatus(`PDF generation failed: ${escapeHtml(err.message)}`, true);
+    }finally{
+      reportEl.classList.remove('pdf-export');
     }
   }
 
